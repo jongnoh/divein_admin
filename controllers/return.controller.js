@@ -69,24 +69,7 @@ class ReturnController {
           });
       }
     }
-    updateCsList = async (req, res) => {
-        try {
-            const { loginId, password, twoFactor } = req.body;
-            const musinsaCsList = await this.musinsaService.getCsListForReturn(loginId, password, twoFactor);
-            const ezAdminCsList = await this.ezAdminService.getCsListForReturn();
-            return res.status(200).json({
-                success: true,
-                statusCode: 200})
-        } catch (error) {
-            console.error('CS 리스트 업데이트 오류:', error);
-            res.status(error.statusCode || 500).json({
-                success: false,
-                statusCode: error.statusCode || 500,
-                message: error.message || 'Internal Server Error',
-                error: error.error || 'UNKNOWN_ERROR'
-            });
-        }
-    }
+
     getMusinsaCsListForReturn = async (req, res) => {
         try {
             let path = await this.excelService.getMusinsaCsListPath()

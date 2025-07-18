@@ -42,7 +42,7 @@ class MusinsaController  {
         updateCsList = async (req, res) => {
         try {
             const { loginId, password, twoFactor } = req.body;
-            const musinsaCsList = await this.musinsaService.getCsListForReturn(loginId, password, twoFactor);
+            const musinsaCsList = await this.musinsaService.updateCsListForReturn(loginId, password, twoFactor);
             return res.status(200).json({
                 success: true,
                 statusCode: 200})

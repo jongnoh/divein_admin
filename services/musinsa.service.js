@@ -159,7 +159,7 @@ class MusinsaService {
         // 메서드 끝에 기본 반환값 추가 (혹시 모를 경우를 위해)
     }
 
-    getCsListForReturn = async (loginId,password,twoFactor) => {
+    updateCsListForReturn = async (loginId,password,twoFactor) => {
         try{
             await this.login(loginId,password,twoFactor)
             await this.downloadClaimList();
@@ -288,7 +288,6 @@ class MusinsaService {
 
     getClaimList = async () => {
         try{
-        await this.downloadClaimList();
         await this.ezAdminService.convertXlsToJson('musinsa.xls', 'musinsa.json', this.csListPath);
 
         // 원본 파일 삭제

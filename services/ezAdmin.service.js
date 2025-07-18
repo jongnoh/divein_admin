@@ -129,7 +129,7 @@ class EzAdminService {
     }
   }
 
-  getCsListForReturn = async () => {
+  updateCsListForReturn = async () => {
     try {
         await this.login(process.env.EZ_ADMIN_LOGIN_DOMAIN, process.env.EZ_ADMIN_LOGIN_ID, process.env.EZ_ADMIN_LOGIN_PW);
         let csvDataObject = await this.getCsListOfLastMonth()
@@ -288,29 +288,6 @@ class EzAdminService {
                     };
                 }
         }
-
-        getCsListOfLastMonth = async () => {
-        try {
-            let filename = (await this.downloadCsListOfLastMonth()).filename
-            let csvData = await this.excelService.parseHtmlToCsvForOrderList(filename)
-            let filteredData = await this.excelService.filterCsvDataForEzAdminReturn(csvData)
-            await this.clearDownloadFolder()
-            return {
-                success: true,
-                statusCode: 200,
-                message: 'CS 내역 조회 및 다운로드가 완료되었습니다.',
-                data: filteredData
-            };
-        } catch (error) {
-            console.error('getCsListOfLastMonth 오류:', error);
-            return {
-                success: false,
-                statusCode: 500,
-                message: '데이터 처리 중 오류가 발생했습니다: ' + error.message,
-                error: error.message,
-            };
-        }
-    }
 
         //미완
         getOrderList = async () => {
