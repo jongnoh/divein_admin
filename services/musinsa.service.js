@@ -8,7 +8,7 @@ const ExcelService = require('./excel.service.js');
     const fs = require('fs');
     const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
-    
+    const options = require('../config/driver.option.js');
 
 
 class MusinsaService {
@@ -20,15 +20,7 @@ class MusinsaService {
         this.ezAdminService = new EzAdminService();
         this.excelService = new ExcelService();
 
-    this.options = new chrome.Options();
-    this.options.addArguments('--window-size=1920,1080');
-    this.options.addArguments('--no-sandbox');
-    this.options.addArguments('--headless'); // Uncomment this line to run in headless mode
-    this.options.addArguments('--disable-gpu');
-    this.options.addArguments('--disable-dev-shm-usage');
-        //this.options.addArguments('--headless');           // 헤드리스 모드
-        //this.options.addArguments('--disable-gpu');
-
+    this.options = options
 
             // 다운로드 경로 설정
     const path = require('path');
