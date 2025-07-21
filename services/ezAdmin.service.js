@@ -128,13 +128,14 @@ class EzAdminService {
         let csvDataObject = await this.getCsListOfLastMonth()
         let csvData = csvDataObject.data
         let jsonData = this.excelService.convertCsvToJson(csvData);
+        let filteredData = this.excelService.filterEmptyValuesFromJson(jsonData);
 
                 // csv data를 csList 폴더에 저장
                 const fs = require('fs');
                 const path = require('path');
                 let csListFileName = 'ezAdmin'
                 const filePath = path.join(this.csListPath, csListFileName) + '.json'; // 현재 시간으로 파일 이름 생성
-                await fs.promises.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf8');
+                await fs.promises.writeFile(filePath, JSON.stringify(filteredData, null, 2), 'utf8');
                 console.log('json 파일이 성공적으로 저장되었습니다:', filePath);
 
       return {

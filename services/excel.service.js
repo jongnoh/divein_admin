@@ -324,6 +324,23 @@ class ExcelService {
             return [];
         }
     }
+
+    filterEmptyValuesFromJson(jsonData) {
+        if (!Array.isArray(jsonData)) {
+            console.log('유효한 JSON 배열이 아닙니다.');
+            return [];
+        }
+        return jsonData.map(row => {
+            const filteredRow = {};
+            for (const key in row) {
+                if (row[key] !== '') {
+                    filteredRow[key] = row[key];
+                }
+            }
+            return filteredRow;
+        });
+    }
+
 /**
  * Excel XML 파일을 JSON 데이터로 변환
  * @param {string} filePath - Excel XML 파일 경로
