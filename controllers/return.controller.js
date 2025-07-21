@@ -52,6 +52,7 @@ class ReturnController {
   getInfoByReturnTraceNumber = async (req, res) => {
       try {
           const { returnTraceNumber } = req.params;
+          console.log('Return Trace Number:', returnTraceNumber);
           if(returnTraceNumber.length == 13) {
             const result = await this.postService.getInfoByReturnTraceNumber(returnTraceNumber);
             res.status(result.statusCode || 200).json(result);

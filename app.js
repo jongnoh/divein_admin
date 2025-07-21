@@ -40,8 +40,8 @@ app.post('/ezAdmin/login', ezAdminController.login);
 app.post('/return/musinsa/process', musinsaController.processCheckList);
 // 반송장으로 원송장번호 조회
 app.get('/return/post/:returnTraceNumber', postController.getOriginalTraceNumber);
-// 개발중
-app.get('/return/info/post/:originalTraceNumber', postController.getInfoByTraceNumber);
+// 통합 반품 정보 조회
+app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTraceNumber);
 // 서버내 csList 업데이트
 app.post('/return/musinsa/csList', musinsaController.updateCsList);
 app.post('/return/ezAdmin/csList', ezAdminController.updateCsList);

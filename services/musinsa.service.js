@@ -3,6 +3,9 @@ const {Builder, By, Key, until, Actions} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
 const ExcelService = require('./excel.service.js');
+
+const option = require('../config/driver.option.js');
+
     // 다운로드 경로 설정
     const path = require('path');
     const fs = require('fs');
@@ -27,7 +30,7 @@ class MusinsaService {
     const fs = require('fs');
     const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
-    
+
     // 다운로드 폴더가 없으면 생성
     if (!fs.existsSync(downloadPath)) {
       fs.mkdirSync(downloadPath, { recursive: true });
@@ -180,6 +183,26 @@ class MusinsaService {
     }
     }
 
+    getInfoByReturnTraceNumber = async (returnNumber) => {
+    const jsonString = fs.readFileSync(path.join(this.csListPath, 'musinsa.json'), 'utf8');
+    const data = JSON.parse(jsonString);
+    
+    const info = data.filter(item => item.반품운송장 === returnNumber);
+
+    if (!info) {
+        return {
+            success: false,
+            statusCode: 404,
+            message: '해당 반품 운송장 번호에 대한 정보가 없습니다.'
+        };
+    } else {
+        return {
+            success: true,
+            statusCode: 200,
+            data: info
+        };
+    }
+    }
 
     getClaimNumber = async (orderNumber, serialNumber) => {
         if (!this.driver) {
