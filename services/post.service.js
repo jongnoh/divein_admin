@@ -4,6 +4,7 @@ const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
 const fs = require('fs');
 const path = require('path');
+const option = require('../config/driver.option.js');
 
 class PostService { 
     
@@ -14,9 +15,7 @@ class PostService {
     constructor() {
         this.ezAdminService = new EzAdminService();
 
-        this.options = new chrome.Options();
-        this.options.addArguments('--window-size=1200,800');
-        this.options.addArguments('--no-sandbox');
+        this.options = option
     }
     // WebDriver 인스턴스를 생성하는 메서드
     async createDriver() {
@@ -30,6 +29,15 @@ class PostService {
         let driver;
         
         try {
+
+            if(returnTraceNumber.length !== 13) {
+                return {
+                    success: false,
+                    statusCode: 400,
+                    message: '우체국 반품 추적번호는 13자리여야 합니다.'
+                };
+            }
+
             driver = await this.createDriver();
 
             await driver.get('https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=' + returnTraceNumber);

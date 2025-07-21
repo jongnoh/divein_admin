@@ -1,6 +1,7 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const ExcelService = require('./excel.service.js');
+const option = require('../config/driver.option.js');
 
 class EzAdminService {
     driver = null;
@@ -8,9 +9,8 @@ class EzAdminService {
   // Chrome 옵션을 클래스 레벨에서 설정
   constructor() {
     this.excelService = new ExcelService();
-    this.options = new chrome.Options();
-    this.options.addArguments('--window-size=1200,800');
-    this.options.addArguments('--no-sandbox');
+    this.options = option
+
     // 다운로드 경로 설정
     const path = require('path');
     const fs = require('fs');
