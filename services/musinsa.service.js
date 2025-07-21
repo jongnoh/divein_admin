@@ -23,7 +23,19 @@ class MusinsaService {
         this.ezAdminService = new EzAdminService();
         this.excelService = new ExcelService();
 
+<<<<<<< HEAD
         this.options = option
+=======
+    this.options = new chrome.Options();
+    this.options.addArguments('--window-size=1920,1080');
+    this.options.addArguments('--no-sandbox');
+    this.options.addArguments('--headless'); // Uncomment this line to run in headless mode
+    this.options.addArguments('--disable-gpu');
+    this.options.addArguments('--disable-dev-shm-usage');
+        //this.options.addArguments('--headless');           // 헤드리스 모드
+        //this.options.addArguments('--disable-gpu');
+
+>>>>>>> acd779ae729a3d9e20652a4b6b0455db6f3c858f
 
             // 다운로드 경로 설정
     const path = require('path');
