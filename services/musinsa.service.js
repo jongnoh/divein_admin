@@ -20,9 +20,12 @@ class MusinsaService {
         this.ezAdminService = new EzAdminService();
         this.excelService = new ExcelService();
 
-        this.options = new chrome.Options();
-        this.options.addArguments('--window-size=1200,800');
-        this.options.addArguments('--no-sandbox');
+    this.options = new chrome.Options();
+    this.options.addArguments('--window-size=1920,1080');
+    this.options.addArguments('--no-sandbox');
+    this.options.addArguments('--headless'); // Uncomment this line to run in headless mode
+    this.options.addArguments('--disable-gpu');
+    this.options.addArguments('--disable-dev-shm-usage');
         //this.options.addArguments('--headless');           // 헤드리스 모드
         //this.options.addArguments('--disable-gpu');
 
@@ -159,7 +162,7 @@ class MusinsaService {
         // 메서드 끝에 기본 반환값 추가 (혹시 모를 경우를 위해)
     }
 
-    getCsListForReturn = async (loginId,password,twoFactor) => {
+    updateCsListForReturn = async (loginId,password,twoFactor) => {
         try{
             await this.login(loginId,password,twoFactor)
             await this.downloadClaimList();
@@ -288,7 +291,6 @@ class MusinsaService {
 
     getClaimList = async () => {
         try{
-        await this.downloadClaimList();
         await this.ezAdminService.convertXlsToJson('musinsa.xls', 'musinsa.json', this.csListPath);
 
         // 원본 파일 삭제

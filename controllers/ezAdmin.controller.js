@@ -26,7 +26,7 @@ class EzAdminController {
   }
     updateCsList = async (req, res) => {
         try {
-            const ezAdminCsList = await this.ezAdminService.getCsListForReturn();
+            const ezAdminCsList = await this.ezAdminService.updateCsListForReturn();
             return res.status(200).json({
                 success: true,
                 statusCode: 200
@@ -41,26 +41,6 @@ class EzAdminController {
             });
         }
     }
-
-        getEzaAdminCsList = async (req, res) => {
-      try {
-          const result = await this.ezAdminService.getCsListOfLastMonth();
-          res.status(result.statusCode ? result.statusCode : 200).json(result);
-      } catch (error) {
-          console.error('Error occurred:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
-      }
-  }
-
-  getCountOfSentList = async (req, res) => {
-    try {
-      const result = await this.ezAdminService.getOrderList();
-      res.status(result.statusCode ? result.statusCode : 200).json(result);
-    } catch (error) {
-      console.error('Error occurred:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
 }
 
 module.exports = EzAdminController;

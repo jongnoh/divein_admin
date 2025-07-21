@@ -37,8 +37,6 @@ app.get('/return/musinsa/claimNumber/:orderNumber/:serialNumber', musinsaControl
 app.post('/musinsa/login', musinsaController.login);
 app.get('/musinsa/claimList', musinsaController.getClaimList);
 app.post('/ezAdmin/login', ezAdminController.login);
-app.get('/ezAdmin/csList', ezAdminController.getEzaAdminCsList);
-app.get('/ezAdmin/sentList', ezAdminController.getCountOfSentList);
 app.post('/return/musinsa/process', musinsaController.processCheckList);
 // 반송장으로 원송장번호 조회
 app.get('/return/post/:returnTraceNumber', postController.getOriginalTraceNumber);
@@ -57,8 +55,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}`);
   
-  // 데이터베이스 연결 테스트
-  await testConnection();
 });
 
 

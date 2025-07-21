@@ -14,9 +14,12 @@ class PostService {
     constructor() {
         this.ezAdminService = new EzAdminService();
 
-        this.options = new chrome.Options();
-        this.options.addArguments('--window-size=1200,800');
-        this.options.addArguments('--no-sandbox');
+    this.options = new chrome.Options();
+    this.options.addArguments('--window-size=1920,1080');
+    this.options.addArguments('--no-sandbox');
+    this.options.addArguments('--headless'); // Uncomment this line to run in headless mode
+    this.options.addArguments('--disable-gpu');
+    this.options.addArguments('--disable-dev-shm-usage');
     }
     // WebDriver 인스턴스를 생성하는 메서드
     async createDriver() {
