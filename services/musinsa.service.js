@@ -4,14 +4,13 @@ const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
 const ExcelService = require('./excel.service.js');
 
-const option = require('../config/driver.option.js');
+const options = require('../config/driver.option.js');
 
     // 다운로드 경로 설정
     const path = require('path');
     const fs = require('fs');
     const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
-    
 
 
 class MusinsaService {
@@ -23,7 +22,7 @@ class MusinsaService {
         this.ezAdminService = new EzAdminService();
         this.excelService = new ExcelService();
 
-        this.options = option
+        this.options = options
 
             // 다운로드 경로 설정
     const path = require('path');

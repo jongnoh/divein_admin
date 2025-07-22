@@ -29,14 +29,7 @@ class EzAdminService {
       console.log('cslist 폴더 생성:', csListPath);
     }
     
-    this.options.setUserPreferences({
-      'download.default_directory': downloadPath,
-      'download.prompt_for_download': false,
-      'download.directory_upgrade': true,
-      'safebrowsing.enabled': true,
-      'plugins.always_open_pdf_externally': true // PDF 파일 자동 다운로드
-    });
-    
+    this.options
     this.downloadPath = downloadPath; // 나중에 사용할 수 있도록 저장
     this.csListPath = csListPath; // CSV 저장 경로
   }
@@ -135,14 +128,14 @@ class EzAdminService {
         let csvDataObject = await this.getCsListOfLastMonth()
         let csvData = csvDataObject.data
         let jsonData = this.excelService.convertCsvToJson(csvData);
-        let filteredJsonData = this.excelService.filterJsonData(jsonData);
+        let filteredData = this.excelService.filterEmptyValuesFromJson(jsonData);
 
                 // csv data를 csList 폴더에 저장
                 const fs = require('fs');
                 const path = require('path');
                 let csListFileName = 'ezAdmin'
                 const filePath = path.join(this.csListPath, csListFileName) + '.json'; // 현재 시간으로 파일 이름 생성
-                await fs.promises.writeFile(filePath, JSON.stringify(filteredJsonData, null, 2), 'utf8');
+                await fs.promises.writeFile(filePath, JSON.stringify(filteredData, null, 2), 'utf8');
                 console.log('json 파일이 성공적으로 저장되었습니다:', filePath);
 
       return {
@@ -289,6 +282,31 @@ class EzAdminService {
                     };
                 }
         }
+          getCsListOfLastMonth = async () => {
+        try {
+            let filename = (await this.downloadCsListOfLastMonth()).filename
+            let csvData = await this.excelService.parseHtmlToCsvForOrderList(filename)
+            let filteredData = await this.excelService.filterCsvDataForEzAdminReturn(csvData)
+            await this.clearDownloadFolder()
+            return {
+                success: true,
+                statusCode: 200,
+                message: 'CS 내역 조회 및 다운로드가 완료되었습니다.',
+                data: filteredData
+            };
+        } catch (error) {
+            console.error('getCsListOfLastMonth 오류:', error);
+            return {
+                success: false,
+                statusCode: 500,
+                message: '데이터 처리 중 오류가 발생했습니다: ' + error.message,
+                error: error.message,
+            };
+        }
+    }
+
+
+
 
         //미완
         getOrderList = async () => {
