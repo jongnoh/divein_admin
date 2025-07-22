@@ -127,8 +127,8 @@ class EzAdminService {
         await this.login(process.env.EZ_ADMIN_LOGIN_DOMAIN, process.env.EZ_ADMIN_LOGIN_ID, process.env.EZ_ADMIN_LOGIN_PW);
         let csvDataObject = await this.getCsListOfLastMonth()
         let csvData = csvDataObject.data
-        let jsonData = this.excelService.convertCsvToJson(csvData);
-        let filteredData = this.excelService.filterEmptyValuesFromJson(jsonData);
+        let jsonData = await this.excelService.convertCsvToJson(csvData);
+        let filteredData = await this.excelService.filterEmptyValuesFromJson(jsonData);
 
                 // csv data를 csList 폴더에 저장
                 const fs = require('fs');

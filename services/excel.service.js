@@ -325,17 +325,22 @@ class ExcelService {
         }
     }
 
-    filterEmptyValuesFromJson(jsonData) {
-        if (!Array.isArray(jsonData) || jsonData.length === 0) {
-            console.log('JSON 데이터가 유효하지 않습니다.');
-            return jsonData;
-        }
-
-        // 빈 값 필터링
-        return jsonData.filter(item => {
-            return Object.values(item).some(value => value !== '');
-        });
+    filterEmptyValuesFromJson(jsonArray) {
+    if (!Array.isArray(jsonArray) || jsonArray.length === 0) {
+        console.log('JSON 데이터가 유효하지 않습니다.');
+        return jsonArray;
     }
+
+    return jsonArray.map(obj => {
+        const newObj = {};
+        Object.keys(obj).forEach(key => {
+            if (obj[key] !== "") {
+                newObj[key] = obj[key];
+            }
+        });
+        return newObj;
+    });
+}
 
 /**
  * Excel XML 파일을 JSON 데이터로 변환
