@@ -51,6 +51,14 @@ app.get('/return/ezAdmin/csList', returnController.getEzAdminCsListForReturn);
 
 const PORT = process.env.PORT || 3000;
 
+testConnection()
+  .then((connected) => {
+    if (!connected) {
+      console.error('DB 연결 실패. 서버를 종료합니다.');
+      process.exit(1);
+    }
+  });
+
 // 서버 시작
 app.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}`);
