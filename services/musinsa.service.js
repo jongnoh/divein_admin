@@ -6,6 +6,8 @@ const ExcelService = require('./excel.service.js');
 
 const options = require('../config/driver.option.js');
 
+const MusinsaCsDTO = require('../dto/musinsaCsDTO.js');     
+
     // 다운로드 경로 설정
     const path = require('path');
     const fs = require('fs');
@@ -23,6 +25,8 @@ class MusinsaService {
         this.excelService = new ExcelService();
 
         this.options = options
+
+        this.musinsaCsDTO = MusinsaCsDTO;
 
             // 다운로드 경로 설정
     const path = require('path');
@@ -165,7 +169,9 @@ class MusinsaService {
             //jsonData를 csList폴더에 저장
             const jsonFilePath = path.join(this.csListPath, 'musinsa.json');
         await fs.promises.writeFile(jsonFilePath, JSON.stringify(jsonData, null, 2));
-
+        const csDTOArray = data.map(item => new MusinsaCsDTO(item));
+        await this.repository.bulkCreateMusinsaCsList(csDTOArray);
+        
         return {
             success: true,
             statusCode: 200,

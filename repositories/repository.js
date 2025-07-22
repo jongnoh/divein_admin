@@ -25,6 +25,18 @@ class Repository {
             throw error;
         }
     }
+    async bulkCreateMusinsaCsList(data) {
+        try {
+            const result = await this.models.musinsa_claim_list.bulkCreate(data, { ignoreDuplicates: true });
+            console.log('Bulk create musinsa_cs_list 성공:', result.length);
+            return result;
+        } catch (error) {
+            console.error('Error in bulkCreateMusinsaCsList:', error);
+            throw error;
+        }
+    }
+
+
     
 }
 

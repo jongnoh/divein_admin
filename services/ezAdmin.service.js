@@ -9,7 +9,6 @@ const EzAdminCsDTO = require('../dto/ezAdminCsDTO.js');
     // 다운로드 경로 설정
     const path = require('path');
     const fs = require('fs');
-const { filter } = require('jszip');
     const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
     
