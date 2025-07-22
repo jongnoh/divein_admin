@@ -51,6 +51,10 @@ module.exports = function(sequelize, DataTypes) {
     claim_number: {
       type: DataTypes.STRING(64),
       allowNull: true
+    },
+    claim_status: {
+      type: DataTypes.STRING(30),
+      allowNull: true
     }
   }, {
     sequelize,

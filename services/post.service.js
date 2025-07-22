@@ -1,4 +1,4 @@
-const repository = require('../repositories/repository.js');
+
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
@@ -7,8 +7,6 @@ const path = require('path');
 const option = require('../config/driver.option.js');
 
 class PostService { 
-    
-    repository = new repository();
     csListPath = path.join(__dirname, '..', 'csList')
 
     // Chrome 옵션을 클래스 레벨에서 설정

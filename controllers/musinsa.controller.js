@@ -45,7 +45,8 @@ class MusinsaController  {
             const musinsaCsList = await this.musinsaService.updateCsListForReturn(loginId, password, twoFactor);
             return res.status(200).json({
                 success: true,
-                statusCode: 200})
+                statusCode: 200
+            })
         } catch (error) {
             console.error('CS 리스트 업데이트 오류:', error);
             res.status(error.statusCode || 500).json({
@@ -121,6 +122,21 @@ class MusinsaController  {
                 success: false,
                 statusCode: 500,
                 message: 'Driver 종료 중 오류가 발생했습니다: ' + error.message 
+            });
+        }
+    }
+
+    updateClaimNumber = async (req, res) => {
+        try {
+            const result = await this.musinsaService.updateClaimNumber();
+            res.status(result.statusCode || 200).json(result);
+        } catch (error) {
+            console.error('Update Claim Number 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
             });
         }
     }

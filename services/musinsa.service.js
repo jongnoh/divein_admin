@@ -1,4 +1,4 @@
-const Repository = require('../repositories/repository.js');
+const MusinsaRepository = require('../repositories/musinsa.repository.js');
 const {Builder, By, Key, until, Actions} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
@@ -16,11 +16,12 @@ const MusinsaCsDTO = require('../dto/musinsaCsDTO.js');
 
 
 class MusinsaService {
-    repository = new Repository();
+
     driver = null; // driver 인스턴스를 클래스 속성으로 관리
 
     // Chrome 옵션을 클래스 레벨에서 설정
     constructor() {
+        this.musinsaRepository = new MusinsaRepository();
         this.ezAdminService = new EzAdminService();
         this.excelService = new ExcelService();
 
@@ -169,9 +170,9 @@ class MusinsaService {
             //jsonData를 csList폴더에 저장
             const jsonFilePath = path.join(this.csListPath, 'musinsa.json');
         await fs.promises.writeFile(jsonFilePath, JSON.stringify(jsonData, null, 2));
-        const csDTOArray = data.map(item => new MusinsaCsDTO(item));
-        await this.repository.bulkCreateMusinsaCsList(csDTOArray);
-        
+        const csDTOArray = jsonData.map(item => new MusinsaCsDTO(item));
+        await Promise.all(csDTOArray.map(claim => this.musinsaRepository.upsertCsList(claim)));
+        this.updateClaimNumber();
         return {
             success: true,
             statusCode: 200,
@@ -186,6 +187,21 @@ class MusinsaService {
                 error: error.message
             };
     }
+}
+
+    //claimStatus 교환요청 / 환불요청만
+    updateClaimNumber = async () => {
+        const data = await this.musinsaRepository.findAllForUpdateClaimNumber()
+        let claimNumber;
+        for (const order of data) {
+            claimNumber = await this.getClaimNumber(order.order_number, order.serial_number);
+            await this.musinsaRepository.updateClaimNumber(order.id, claimNumber.CLM_NO);
+        };
+        return {
+            success: true,
+            statusCode: 200,
+            message: '클레임 번호가 업데이트되었습니다.'
+        };
     }
 
     getInfoByReturnTraceNumber = async (returnNumber) => {

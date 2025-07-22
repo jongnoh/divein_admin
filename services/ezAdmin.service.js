@@ -2,7 +2,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const ExcelService = require('./excel.service.js');
 const option = require('../config/driver.option.js');
-const Repository = require('../repositories/repository.js');
+const EzAdminRepository = require('../repositories/ezAdmin.repository.js');
 
 const EzAdminCsDTO = require('../dto/ezAdminCsDTO.js');
 
@@ -38,7 +38,7 @@ class EzAdminService {
     this.downloadPath = downloadPath; // 나중에 사용할 수 있도록 저장
     this.csListPath = csListPath; // CSV 저장 경로
 
-    this.repository = new Repository();
+    this.ezadminRepository = new EzAdminRepository();
     this.ezAdminCsDTO = EzAdminCsDTO
   }
 
@@ -138,7 +138,10 @@ class EzAdminService {
         const jsonData = await this.excelService.convertCsvToJson(csvData);
         const filteredData = await this.excelService.filterEmptyValuesFromJson(jsonData);
         const csDTOArray = filteredData.map(data => new EzAdminCsDTO(data));
-        await this.repository.bulkCreateEzAdminReturnClaims(csDTOArray);
+        csDTOArray.forEach(async csDTO => {
+            await this.ezadminRepository.upsertEzAdminReturnClaims(csDTO);
+        });
+
         const csDetails = filteredData.flatMap(data =>
           Object.keys(data)
             .filter(key => key.includes('C/S 내역'))
@@ -147,7 +150,9 @@ class EzAdminService {
               detail: data[key],
               management_number: data['관리번호']
             })));
-        await this.repository.bulkCreateEzAdminCsDetails(csDetails);
+        csDetails.forEach(async csDetail => {
+            await this.ezadminRepository.upsertEzAdminCsDetails(csDetail);
+        });
 
       return {
         success: true,
@@ -164,6 +169,11 @@ class EzAdminService {
       };
     }
   }
+  updateClaimNumber = async () => {
+    
+
+  }
+
 
   // driver를 수동으로 종료하는 메서드
   async closeDriver() {

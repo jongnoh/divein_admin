@@ -45,6 +45,7 @@ app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTrace
 // 서버내 csList 업데이트
 app.post('/return/musinsa/csList', musinsaController.updateCsList);
 app.post('/return/ezAdmin/csList', ezAdminController.updateCsList);
+app.get('/return/musinsa/csList/claimNumber', musinsaController.updateClaimNumber);
 // csList 파일 요청
 app.get('/return/musinsa/csList', returnController.getMusinsaCsListForReturn);
 app.get('/return/ezAdmin/csList', returnController.getEzAdminCsListForReturn);

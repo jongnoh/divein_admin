@@ -11,6 +11,7 @@ class MusinsaCsDTO {
         this.product_name = data['상품명'];
         this.product_option = data['옵션'];
         this.claim_number = null
+        this.claim_status = data['클레임상태'];
     }
 }
 module.exports = MusinsaCsDTO;
