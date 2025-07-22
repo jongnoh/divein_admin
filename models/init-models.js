@@ -10,8 +10,8 @@ function initModels(sequelize) {
   var musinsa_claim_list = _musinsa_claim_list(sequelize, DataTypes);
   var return_inspection_list = _return_inspection_list(sequelize, DataTypes);
 
-  ezadmin_cs_detail.belongsTo(ezadmin_return_claim, { as: "ezadmin_return_claim", foreignKey: "ezadmin_return_claim_id"});
-  ezadmin_return_claim.hasMany(ezadmin_cs_detail, { as: "ezadmin_cs_details", foreignKey: "ezadmin_return_claim_id"});
+  ezadmin_cs_detail.belongsTo(ezadmin_return_claim, { as: "management_number_ezadmin_return_claim", foreignKey: "management_number"});
+  ezadmin_return_claim.hasMany(ezadmin_cs_detail, { as: "ezadmin_cs_details", foreignKey: "management_number"});
 
   return {
     ezadmin_cs_detail,

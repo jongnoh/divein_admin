@@ -13,7 +13,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     management_number: {
       type: DataTypes.STRING(32),
-      allowNull: true
+      allowNull: true,
+      unique: "management_number_2"
     },
     channel: {
       type: DataTypes.STRING(32),
@@ -50,6 +51,22 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "id" },
+        ]
+      },
+      {
+        name: "management_number",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "management_number" },
+        ]
+      },
+      {
+        name: "management_number_2",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "management_number" },
         ]
       },
     ]

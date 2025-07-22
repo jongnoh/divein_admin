@@ -2,6 +2,17 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const ExcelService = require('./excel.service.js');
 const option = require('../config/driver.option.js');
+const Repository = require('../repositories/repository.js');
+
+const EzAdminCsDTO = require('../dto/ezAdminCsDTO.js');
+
+    // 다운로드 경로 설정
+    const path = require('path');
+    const fs = require('fs');
+const { filter } = require('jszip');
+    const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
+    const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
+    
 
 class EzAdminService {
     driver = null;
@@ -11,12 +22,7 @@ class EzAdminService {
     this.excelService = new ExcelService();
     this.options = option
 
-    // 다운로드 경로 설정
-    const path = require('path');
-    const fs = require('fs');
-    const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
-    const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
-    
+
     // 다운로드 폴더가 없으면 생성
     if (!fs.existsSync(downloadPath)) {
       fs.mkdirSync(downloadPath, { recursive: true });
@@ -32,6 +38,9 @@ class EzAdminService {
     this.options
     this.downloadPath = downloadPath; // 나중에 사용할 수 있도록 저장
     this.csListPath = csListPath; // CSV 저장 경로
+
+    this.repository = new Repository();
+    this.ezAdminCsDTO = EzAdminCsDTO
   }
 
   // WebDriver 인스턴스를 생성하는 메서드
@@ -125,23 +134,26 @@ class EzAdminService {
   updateCsListForReturn = async () => {
     try {
         await this.login(process.env.EZ_ADMIN_LOGIN_DOMAIN, process.env.EZ_ADMIN_LOGIN_ID, process.env.EZ_ADMIN_LOGIN_PW);
-        let csvDataObject = await this.getCsListOfLastMonth()
-        let csvData = csvDataObject.data
-        let jsonData = await this.excelService.convertCsvToJson(csvData);
-        let filteredData = await this.excelService.filterEmptyValuesFromJson(jsonData);
-
-                // csv data를 csList 폴더에 저장
-                const fs = require('fs');
-                const path = require('path');
-                let csListFileName = 'ezAdmin'
-                const filePath = path.join(this.csListPath, csListFileName) + '.json'; // 현재 시간으로 파일 이름 생성
-                await fs.promises.writeFile(filePath, JSON.stringify(filteredData, null, 2), 'utf8');
-                console.log('json 파일이 성공적으로 저장되었습니다:', filePath);
+        const csvDataObject = await this.getCsListOfLastMonth()
+        const csvData = csvDataObject.data
+        const jsonData = await this.excelService.convertCsvToJson(csvData);
+        const filteredData = await this.excelService.filterEmptyValuesFromJson(jsonData);
+        const csDTOArray = filteredData.map(data => new EzAdminCsDTO(data));
+        await this.repository.bulkCreateEzAdminReturnClaims(csDTOArray);
+        const csDetails = filteredData.flatMap(data =>
+          Object.keys(data)
+            .filter(key => key.includes('C/S 내역'))
+            .map(key => ({
+              detail_index: key.slice(-1),
+              detail: data[key],
+              management_number: data['관리번호']
+            })));
+        await this.repository.bulkCreateEzAdminCsDetails(csDetails);
 
       return {
         success: true,
         statusCode: 200,
-        data: csListFileName
+        message: 'CS 리스트 업데이트가 완료되었습니다.',
       };
     } catch (error) {
       console.error('getCsListForReturn 오류:', error);

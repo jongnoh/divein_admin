@@ -7,14 +7,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    ezadmin_return_claim_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'ezadmin_return_claim',
-        key: 'id'
-      }
-    },
     detail_index: {
       type: DataTypes.INTEGER,
       allowNull: true
@@ -22,6 +14,14 @@ module.exports = function(sequelize, DataTypes) {
     detail: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    management_number: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+      references: {
+        model: 'ezadmin_return_claim',
+        key: 'management_number'
+      }
     }
   }, {
     sequelize,
@@ -37,10 +37,20 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "ezadmin_return_claim_id",
+        name: "unique_detail_index_detail_management_number",
+        unique: true,
+        using: "HASH",
+        fields: [
+          { name: "detail_index" },
+          { name: "detail" },
+          { name: "management_number" },
+        ]
+      },
+      {
+        name: "fk_cs_detail_return_claim",
         using: "BTREE",
         fields: [
-          { name: "ezadmin_return_claim_id" },
+          { name: "management_number" },
         ]
       },
     ]
