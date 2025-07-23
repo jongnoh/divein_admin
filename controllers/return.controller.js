@@ -51,14 +51,13 @@ class ReturnController {
   // 통합 반품 정보 조회
   getInfoByReturnTraceNumber = async (req, res) => {
       try {
-          const { returnTraceNumber } = req.params;
-          console.log('Return Trace Number:', returnTraceNumber);
+          const {returnTraceNumber} = req.params;
           if(returnTraceNumber.length == 13) {
             const result = await this.postService.getInfoByReturnTraceNumber(returnTraceNumber);
-            res.status(result.statusCode || 200).json(result);
+            res.status(result.statusCode || 200).json(result.data);
           } else {
             const result = await this.musinsaService.getInfoByReturnTraceNumber(returnTraceNumber);
-            res.status(result.statusCode || 200).json(result);
+            res.status(result.statusCode || 200).json(result.data);
           }
       } catch (error) {
           console.error('Get Info By Return Trace Number 오류:', error);

@@ -52,5 +52,19 @@ async findAllForUpdateClaimNumber() {
             throw error;
         }
     }
+    async findAllByReturnTraceNumber(returnTraceNumber) {
+        try {
+            const result = await this.models.musinsa_claim_list.findAll({
+                where: {
+                    return_trace_number: returnTraceNumber
+                },
+                raw: true
+            });
+            return result;
+        } catch (error) {
+            console.error('Error in findAllByReturnTraceNumber:', error);
+            throw error;
+        }
+    }
 }
 module.exports = EzAdminRepository;

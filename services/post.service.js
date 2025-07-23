@@ -2,9 +2,11 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
+const EzAdminRepository = require('../repositories/ezadmin.repository.js');
 const fs = require('fs');
 const path = require('path');
 const option = require('../config/driver.option.js');
+const { error } = require('console');
 
 class PostService { 
     csListPath = path.join(__dirname, '..', 'csList')
@@ -12,7 +14,7 @@ class PostService {
     // Chrome 옵션을 클래스 레벨에서 설정
     constructor() {
         this.ezAdminService = new EzAdminService();
-
+        this.ezAdminRepository = new EzAdminRepository();
         this.options = option
     }
     // WebDriver 인스턴스를 생성하는 메서드
@@ -76,17 +78,73 @@ class PostService {
             }
         }
     }
-
-    getInfoByTraceNumber = async (originalTraceNumber) => {
-        let database = await fs.readFileSync(path.join(this.csListPath, 'ezAdmin.json'), 'utf8');
-        database = JSON.parse(database); // JSON 문자열에서 양쪽 따옴표 제거 후 파싱
-        const result = database.filter(data => data.송장번호 === originalTraceNumber);
-        return {
-            success: true,
-            statusCode: 200,
-            data: result
+    getInfoByReturnTraceNumber = async (returnTraceNumber) => {
+        try {
+            const originalTraceNumberResult = await this.getOriginalTraceNumber(returnTraceNumber);
+            if (!originalTraceNumberResult.success) {
+                return originalTraceNumberResult;
+            }
+            const originalTraceNumber = originalTraceNumberResult.originalTraceNumber;
+            await this.updateReturnTraceNumber(originalTraceNumber, returnTraceNumber);
+            const result = await this.getInfoByTraceNumber(originalTraceNumber);
+            return {
+                success: true,
+                data: result.data
+            };
+        } catch (error) {
+            console.error('Get Info By Return Trace Number 오류:', error);
+            return {
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            };
+        }
     }
 
+
+    getInfoByTraceNumber = async (originalTraceNumber) => {
+        
+        const info = await this.ezAdminRepository.findAllClaimsByTraceNumber(originalTraceNumber);
+        const details = await this.ezAdminRepository.findAllDetailsByTraceNumber(originalTraceNumber);
+
+
+        if (info.length === 0) {
+            return {
+                success: false,
+                statusCode: 404,
+                message: '해당 반품 추적번호에 대한 정보가 없습니다.'
+            };
+        }
+        return {
+            success: true,
+            data: info,
+            details
+        };
+    }
+    updateReturnTraceNumber = async (originalTraceNumber, returnTraceNumber) => {
+        try {
+            const result = await this.ezAdminRepository.updateReturnTraceNumber(originalTraceNumber, returnTraceNumber);
+            if (result[0] === 0) {
+                return {
+                    success: false,
+                    statusCode: 404,
+                    message: '해당 원본 추적번호에 대한 반품 추적번호 업데이트가 실패했습니다.'
+                };
+            }
+            return {
+                success: true,
+                message: '반품 추적번호가 성공적으로 업데이트되었습니다.'
+            };
+        } catch (error) {
+            console.error('Error in updateReturnTraceNumber:', error);
+            return {
+                success: false,
+                statusCode: 500,
+                message: '반품 추적번호 업데이트 중 오류가 발생했습니다.',
+                error: error.message
+            };
+        }
     }
 }
 module.exports = PostService;

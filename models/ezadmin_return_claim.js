@@ -1,11 +1,10 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('ezadmin_return_claim', {
+  const EzadminReturnClaim = sequelize.define('ezadmin_return_claim', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
     sent_date: {
       type: DataTypes.DATEONLY,
@@ -14,7 +13,8 @@ module.exports = function(sequelize, DataTypes) {
     management_number: {
       type: DataTypes.STRING(32),
       allowNull: true,
-      unique: "management_number_2"
+      unique: "management_number_2",
+            primaryKey: true
     },
     channel: {
       type: DataTypes.STRING(32),
@@ -71,4 +71,14 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+
+  EzadminReturnClaim.associate = (models) => {
+    EzadminReturnClaim.hasMany(models.ezadmin_cs_detail, {
+      foreignKey: 'management_number',
+      sourceKey: 'management_number',
+      as: 'management_number_ezadmin_return_claim'
+    });
+  };
+
+  return EzadminReturnClaim;
 };

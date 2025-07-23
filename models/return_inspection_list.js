@@ -34,11 +34,19 @@ module.exports = function(sequelize, DataTypes) {
     is_repackaged: {
       type: DataTypes.BOOLEAN,
       allowNull: true
+    },
+    is_ezadmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    is_proceed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
     }
   }, {
     sequelize,
     tableName: 'return_inspection_list',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",
