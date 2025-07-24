@@ -42,6 +42,8 @@ app.post('/return/musinsa/process', musinsaController.processCheckList);
 app.get('/return/post/:returnTraceNumber', postController.getOriginalTraceNumber);
 // 통합 반품 정보 조회
 app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTraceNumber);
+// 통합 검수정보 입력
+app.post('/return/inspection', returnController.upsertReturnInspectionList);
 // 서버내 csList 업데이트
 app.post('/return/musinsa/csList', musinsaController.updateCsList);
 app.post('/return/ezAdmin/csList', ezAdminController.updateCsList);

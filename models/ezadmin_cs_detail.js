@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  const EzadminCsDetail = sequelize.define('ezadmin_cs_detail', {
+  return sequelize.define('ezadmin_cs_detail', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -53,9 +53,10 @@ module.exports = function(sequelize, DataTypes) {
           { name: "management_number" },
         ]
       },
-    ]    
+    ]
   });
 
+  
   EzadminCsDetail.associate = (models) => {
     EzadminCsDetail.belongsTo(models.ezadmin_return_claim, {
       foreignKey: 'management_number',

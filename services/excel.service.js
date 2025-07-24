@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
+const MusinsaRepository = require('../repositories/musinsa.repository.js');
+const EzAdminRepository = require('../repositories/ezadmin.repository.js');
+
 class ExcelService {
     constructor() {
 
@@ -11,6 +14,9 @@ class ExcelService {
     const fs = require('fs');
     const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
+    this.musinsaRepository = new MusinsaRepository();
+    this.ezAdminRepository = new EzAdminRepository();
+
     
     // 다운로드 폴더가 없으면 생성
     if (!fs.existsSync(downloadPath)) {
@@ -27,6 +33,35 @@ class ExcelService {
     this.downloadPath = downloadPath; // 나중에 사용할 수 있도록 저장
     this.csListPath = csListPath; // CSV 저장 경로
     
+    }
+
+    upsertReturnInspectionList = async (reqData) => {
+        try {
+            const { return_trace_number, ezadmin_management_number, musinsa_serial_number, is_refurbishable, is_repackaged } = reqData;
+            if(musinsa_serial_number){
+                const claimData = await this.musinsaRepository.findOneClaimBySerialNumber(musinsa_serial_number)
+                const musinsaProductName = claimData.product_name;
+                const musinsaProductOption = claimData.product_option
+                const product_code = await this.musinsaRepository.findProductCodeByNameAndOption(musinsaProductName, musinsaProductOption);
+                const result = await this.musinsaRepository.upsertReturnInspectionList({
+                    return_trace_number,
+                    ezadmin_management_number,
+                    musinsa_serial_number,
+                    is_refurbishable,
+                    is_repackaged,
+                    product_code
+                });
+            }
+            
+            
+            return {
+                success: true,
+                message: 'Return Inspection List가 성공적으로 저장되었습니다.',
+            };
+        } catch (error) {
+            console.error('Return Inspection List 저장 오류:', error);
+            throw error;
+        }
     }
 
 

@@ -4,7 +4,7 @@ const sequelize = require('../config/database').sequelize;
 const { where, Op } = require('sequelize');
 const initModels = require('../models/init-models');
 
-class EzAdminRepository {
+class MusinsaRepository {
     
     constructor() {
         this.models = initModels(sequelize);
@@ -66,5 +66,45 @@ async findAllForUpdateClaimNumber() {
             throw error;
         }
     }
+    async findOneClaimBySerialNumber(serialNumber) {
+        try {
+            const result = await this.models.musinsa_claim_list.findOne({
+                where: {
+                    serial_number: serialNumber
+                },
+                raw: true
+            });
+            return result;
+        } catch (error) {
+            console.error('Error in findOneClaimBySerialNumber:', error);
+            throw error;
+        }
+    }
+    async findProductCodeByNameAndOption(productName, productOption) {
+        try {
+            const result = await this.models.products_musinsa.findOne({
+                where: {
+                    product_name: productName,
+                    product_option: productOption
+                },
+                attributes: ['product_code'],
+                raw: true
+            });
+            return result ? result.product_code : null;
+        } catch (error) {
+            console.error('Error in findProductCodeByNameAndOption:', error);
+            throw error;
+        }
+    }
+    async upsertReturnInspectionList(data) {
+        try {
+            const result = await this.models.return_inspection_list.upsert(data, { ignoreDuplicates: true });
+            console.log('Upsert return_inspection_list 성공:', result.length);
+            return result;
+        } catch (error) {
+            console.error('Error in upsertReturnInspectionList:', error);
+            throw error;
+        }
+    }
 }
-module.exports = EzAdminRepository;
+module.exports = MusinsaRepository;

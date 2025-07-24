@@ -11,10 +11,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(32),
       allowNull: true
     },
-    claim_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
     channel: {
       type: DataTypes.STRING(32),
       allowNull: true
@@ -35,18 +31,22 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: true
     },
-    is_ezadmin: {
+    is_proceed: {
       type: DataTypes.BOOLEAN,
       allowNull: true
     },
-    is_proceed: {
-      type: DataTypes.BOOLEAN,
+    ezadmin_management_number: {
+      type: DataTypes.STRING(32),
+      allowNull: true
+    },
+    musinsa_serial_number: {
+      type: DataTypes.STRING(32),
       allowNull: true
     }
   }, {
     sequelize,
     tableName: 'return_inspection_list',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",
@@ -58,4 +58,11 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+  return_inspection_list.associate = (models) => {
+    return_inspection_list.hasOne(models.musinsa_claim_list, {
+      foreignKey: 'musinsa_serial_number',
+      sourceKey: 'serial_number',
+      as: 'musinsa_claim_list_return_inspection_list'
+    });
+  }
 };

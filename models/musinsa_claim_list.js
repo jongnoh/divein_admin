@@ -79,4 +79,12 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+
+  musinsa_claim_list.associate = (models) => {
+    musinsa_claim_list.hasOne(models.return_inspection_list, {
+      foreignKey: 'serial_number',
+      targetKey: 'musinsa_serial_number',
+      as: 'musinsa_claim_list_return_inspection_list'
+    });
+  };
 };
