@@ -1,19 +1,19 @@
 const MusinsaService = require('../services/musinsa.service');
 const PostService = require('../services/post.service');
 const EzAdminService = require('../services/ezAdmin.service');
-const ExcelService = require('../services/excel.service');
+const DiveinService = require('../services/divein.service');
 
 class ReturnController {
   constructor() {
     this.musinsaService = new MusinsaService();
     this.postService = new PostService();
     this.ezAdminService = new EzAdminService();
-    this.excelService = new ExcelService();
+    this.diveinService = new DiveinService();
   }
     // CS 반품 리스트 파싱
     updateCsRetrieveList = async (req, res) => {
         try {
-            const result = this.excelService.updateCsRetrieveList(req.body.fileName);
+            const result = this.diveinService.updateCsRetrieveList(req.body.fileName);
             
             res.json({
                 success: true,
@@ -73,7 +73,7 @@ class ReturnController {
     upsertReturnInspectionList = async (req, res) => {
         try {
             if(req.body.musinsa_serial_number || req.body.ezadmin_management_number) {
-            const result = await this.excelService.upsertReturnInspectionList(req.body);
+            const result = await this.diveinService.upsertReturnInspectionList(req.body);
             } else{
             return res.status(400).json({
                 success: false,
@@ -117,7 +117,7 @@ class ReturnController {
 
     getMusinsaCsListForReturn = async (req, res) => {
         try {
-            let path = await this.excelService.getMusinsaCsListPath()
+            let path = await this.diveinService.getMusinsaCsListPath()
             return res.status(200).download(path, (err) => {
                 if (err) {
                     console.error('무신사 CS 리스트 다운로드 오류:', err);
@@ -140,7 +140,7 @@ class ReturnController {
     }
         getEzAdminCsListForReturn = async (req, res) => {
         try {
-            let path = await this.excelService.getEzAdminCsListPath()
+            let path = await this.diveinService.getEzAdminCsListPath()
             return res.status(200).download(path, (err) => {
                 if (err) {
                     console.error('ezAdmin CS 리스트 다운로드 오류:', err);

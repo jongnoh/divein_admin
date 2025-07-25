@@ -2,7 +2,7 @@ const MusinsaRepository = require('../repositories/musinsa.repository.js');
 const {Builder, By, Key, until, Actions} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const EzAdminService = require('./ezAdmin.service.js');
-const ExcelService = require('./excel.service.js');
+const ExcelService = require('./divein.service.js');
 
 const options = require('../config/driver.option.js');
 

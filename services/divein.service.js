@@ -6,7 +6,7 @@ const cheerio = require('cheerio');
 const MusinsaRepository = require('../repositories/musinsa.repository.js');
 const EzAdminRepository = require('../repositories/ezadmin.repository.js');
 
-class ExcelService {
+class DiveinService {
     constructor() {
 
            // 다운로드 경로 설정
@@ -742,4 +742,4 @@ decodeHtmlEntities(str) {
         }
     }
 }
-module.exports = ExcelService;
+module.exports = DiveinService;

@@ -1,6 +1,6 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const ExcelService = require('./excel.service.js');
+const ExcelService = require('./divein.service.js');
 const option = require('../config/driver.option.js');
 const EzAdminRepository = require('../repositories/ezAdmin.repository.js');
 
