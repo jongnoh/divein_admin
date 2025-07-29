@@ -207,6 +207,24 @@ class MusinsaService {
 
     getInfoByReturnTraceNumber = async (returnNumber) => {
     const data = await this.musinsaRepository.findAllByReturnTraceNumber(returnNumber);
+    await Promise.all(data.map(async (item) => {
+        const productCode = await this.musinsaRepository.findOneProductCodeByNameAndOption(item.product_name, item.product_option);
+        item.product_code = productCode
+    }));
+    let returnValue = data.map(item => ({
+          "반송장번호": item.return_trace_number,
+          "판매처":"무신사",
+  "택배업체": item.delivery_company,
+"상품코드" : item.product_code,
+  "상품명": item.product_name,
+  "옵션": item.product_option,
+  "클레임사유": item.claim_reason,
+  "클레임상태": item.claim_status,
+  "주문번호" : item.order_number,
+  "일련번호" : item.serial_number,
+
+}));
+
 
     if (!data) {
         throw error({
@@ -217,9 +235,21 @@ class MusinsaService {
     } else {
         return {
             success: true,
-            data: data
+            data: returnValue
         };
     }
+    }
+
+    getProductNameAndOptionByProductCode = async (productCode) => {
+        const product = await this.musinsaRepository.findOneProductNameAndOptionByProductCode(productCode);
+        const returnValue = {
+            "상품명": product.product_name,
+            "옵션": product.product_option
+        }
+        if (!product) {
+            throw new Error('해당 상품이 없습니다.');
+        }
+        return returnValue;
     }
 
     getClaimNumber = async (orderNumber, serialNumber) => {

@@ -5,22 +5,9 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+
     },
-    sent_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
-    },
-    management_number: {
-      type: DataTypes.STRING(32),
-      allowNull: true,
-      unique: "management_number_2"
-    },
-    channel: {
-      type: DataTypes.STRING(32),
-      allowNull: true
-    },
-    order_number: {
+    return_trace_number: {
       type: DataTypes.STRING(64),
       allowNull: true
     },
@@ -28,17 +15,31 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(64),
       allowNull: true
     },
-    return_trace_number: {
-      type: DataTypes.STRING(64),
+    sent_date: {
+      type: DataTypes.DATEONLY,
       allowNull: true
     },
     product_code: {
       type: DataTypes.STRING(32),
       allowNull: true
     },
+    order_number: {
+      type: DataTypes.STRING(64),
+      allowNull: true
+    },
+    channel: {
+      type: DataTypes.STRING(32),
+      allowNull: true
+    },
     cs_count: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    management_number: {
+      type: DataTypes.STRING(32),
+      allowNull: true,
+      unique: "management_number_2",
+            primaryKey: true
     }
   }, {
     sequelize,
@@ -71,15 +72,4 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
-
-  
-    EzadminReturnClaim.associate = (models) => {
-    EzadminReturnClaim.hasMany(models.ezadmin_cs_detail, {
-      foreignKey: 'management_number',
-      sourceKey: 'management_number',
-      as: 'management_number_ezadmin_return_claim'
-    });
-  };
-
-  return EzadminReturnClaim;
 };

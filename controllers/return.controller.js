@@ -53,11 +53,11 @@ class ReturnController {
       try {
           const {returnTraceNumber} = req.params;
           if(returnTraceNumber.length == 13) {
-            const result = await this.postService.getInfoByReturnTraceNumber(returnTraceNumber);
-            res.status(result.statusCode || 200).json(result.data);
+            const result = await this.postService.getInfoByReturnOrOriginalTraceNumber(returnTraceNumber);
+            res.status(result.statusCode || 200).json(result);
           } else {
             const result = await this.musinsaService.getInfoByReturnTraceNumber(returnTraceNumber);
-            res.status(result.statusCode || 200).json(result.data);
+            res.status(result.statusCode || 200).json(result);
           }
       } catch (error) {
           console.error('Get Info By Return Trace Number 오류:', error);
@@ -72,38 +72,18 @@ class ReturnController {
     //통합 검수정보 입력
     upsertReturnInspectionList = async (req, res) => {
         try {
-            if(req.body.musinsa_serial_number || req.body.ezadmin_management_number) {
-            const result = await this.diveinService.upsertReturnInspectionList(req.body);
+            let data = req.query
+            console.log(data.channel)
+            data.channel = decodeURIComponent(data.channel);
+            if(data.musinsa_serial_number || data.ezadmin_management_number) {
+                await this.diveinService.upsertReturnInspectionList(data);
             } else{
             return res.status(400).json({
                 success: false,
                 message: '무신사 시리얼번호 또는 ezAdmin 관리번호가 필요합니다.'
             });
             }
-            res.status(result.statusCode || 200).json(result);
-        } catch (error) {
-            console.error('Post Return Inspection List 오류:', error);
-            res.status(error.statusCode || 500).json({
-                success: false,
-                statusCode: error.statusCode || 500,
-                message: error.message || 'Internal Server Error',
-                error: error.error || 'UNKNOWN_ERROR'
-            });
-        }
-    }
-
-    postReturnInspectionList = async (req, res) => {
-        try {
-
-            const {  claim_id, returnTraceNumber } = req.body;
-            if (!returnTraceNumber) {
-                return res.status(400).json({
-                    success: false,
-                    message: '반품 추적번호가 필요합니다.'
-                });
-            }
-            const result = await this.postService.postReturnInspectionList(returnTraceNumber);
-            res.status(result.statusCode || 200).json(result);
+            res.status(200).json();
         } catch (error) {
             console.error('Post Return Inspection List 오류:', error);
             res.status(error.statusCode || 500).json({

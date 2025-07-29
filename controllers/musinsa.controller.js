@@ -140,6 +140,22 @@ class MusinsaController  {
             });
         }
     }
+
+    getProductNameAndOptionByProductCode = async (req, res) => {
+        try {
+            const { productCode } = req.params;
+            const result = await this.musinsaService.getProductNameAndOptionByProductCode(productCode);
+            res.status(result.statusCode || 200).json(result);
+        } catch (error) {
+            console.error('Get Product Name and Option 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
 }
 
 module.exports = MusinsaController;

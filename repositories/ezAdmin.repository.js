@@ -26,20 +26,21 @@ class EzAdminRepository {
             throw error;
         }
     }
-    async findAllClaimsByTraceNumber(TraceNumber) {
-        try {
-            const result = await this.models.ezadmin_return_claim.findAll({
-                where: {
-                    original_trace_number: TraceNumber
-                },
-                raw: true
-            });
-            return result;
-        } catch (error) {
-            console.error('Error in findAllClaimsByReturnTraceNumber:', error);
-            throw error;
-        }
+async findAllClaimsByTraceNumber(TraceNumber) {
+    try {
+        const result = await this.models.ezadmin_return_claim.findAll({
+            where: {
+                original_trace_number: TraceNumber
+            },
+            raw: raw // include를 쓸 때는 false가 일반적입니다
+        });
+        return result  
+    
+    } catch (error) {
+        console.error('Error in findAllClaimsByReturnTraceNumber:', error);
+        throw error;
     }
+}
         async findAllDetailsByTraceNumber(TraceNumber) {
         try {
             const result = await this.models.ezadmin_cs_detail.findAll({
@@ -48,9 +49,8 @@ class EzAdminRepository {
                 as: 'management_number_ezadmin_return_claim',
             }],
             where: {
-                '$management_number_ezadmin_return_claim.original_trace_number$': '6091476094215'
-            },
-            logging: console.log
+                '$management_number_ezadmin_return_claim.original_trace_number$': TraceNumber
+            }
             });
             return result;
         } catch (error) {
@@ -68,6 +68,18 @@ class EzAdminRepository {
             return result;
         } catch (error) {
             console.error('Error in updateReturnTraceNumber:', error);
+            throw error;
+        }
+    }
+    async findOneProductByProductCode(productCode) {
+        try {
+            const result = await this.models.products_ezadmin.findOne({
+                where: { product_code: productCode },
+                raw: true
+            });
+            return result;
+        } catch (error) {
+            console.error('Error in findOneProductByProductCode:', error);
             throw error;
         }
     }

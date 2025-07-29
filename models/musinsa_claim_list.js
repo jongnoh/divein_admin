@@ -7,18 +7,14 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    requested_datetime: {
-      type: DataTypes.DATE,
-      allowNull: true
-    },
-    order_number: {
-      type: DataTypes.STRING(64),
-      allowNull: true
-    },
     serial_number: {
       type: DataTypes.STRING(64),
       allowNull: true,
       unique: "unique_serial_number"
+    },
+    order_number: {
+      type: DataTypes.STRING(64),
+      allowNull: true
     },
     delivery_company: {
       type: DataTypes.STRING(32),
@@ -55,6 +51,14 @@ module.exports = function(sequelize, DataTypes) {
     claim_status: {
       type: DataTypes.STRING(30),
       allowNull: true
+    },
+    comment: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    requested_datetime: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -79,12 +83,4 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
-
-  musinsa_claim_list.associate = (models) => {
-    musinsa_claim_list.hasOne(models.return_inspection_list, {
-      foreignKey: 'serial_number',
-      targetKey: 'musinsa_serial_number',
-      as: 'musinsa_claim_list_return_inspection_list'
-    });
-  };
 };

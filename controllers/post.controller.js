@@ -20,6 +20,21 @@ class PostController {
             });
         }
     }
+    getTrace = async (req, res) => {
+        try {
+            const result = await this.postService.getTrace()
+            res.status(result.statusCode || 200).json(result);
+        }
+        catch (error) {
+            console.error('Get Trace 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
     getInfoByTraceNumber = async (req, res) => {
         try {
             const originalTraceNumber = req.params.originalTraceNumber;
@@ -35,5 +50,6 @@ class PostController {
             });
         }
     }
+    
 }
 module.exports = PostController;

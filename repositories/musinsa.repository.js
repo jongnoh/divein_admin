@@ -80,7 +80,7 @@ async findAllForUpdateClaimNumber() {
             throw error;
         }
     }
-    async findProductCodeByNameAndOption(productName, productOption) {
+    async findOneProductCodeByNameAndOption(productName, productOption) {
         try {
             const result = await this.models.products_musinsa.findOne({
                 where: {
@@ -96,6 +96,23 @@ async findAllForUpdateClaimNumber() {
             throw error;
         }
     }
+
+    async findOneProductNameAndOptionByProductCode(productCode) {
+        try {
+            const result = await this.models.products_musinsa.findOne({
+                where: {
+                    product_code: productCode
+                },
+                attributes: ['product_name', 'product_option'],
+                raw: true
+            });
+            return result
+        } catch (error) {
+            console.error('Error in findProductCodeByNameAndOption:', error);
+            throw error;
+        }
+    }
+
     async upsertReturnInspectionList(data) {
         try {
             const result = await this.models.return_inspection_list.upsert(data, { ignoreDuplicates: true });
@@ -106,5 +123,7 @@ async findAllForUpdateClaimNumber() {
             throw error;
         }
     }
+
+
 }
 module.exports = MusinsaRepository;

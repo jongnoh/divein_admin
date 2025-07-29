@@ -7,10 +7,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    product_code: {
-      type: DataTypes.STRING(32),
-      allowNull: true
-    },
     channel: {
       type: DataTypes.STRING(32),
       allowNull: true
@@ -19,8 +15,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(64),
       allowNull: true
     },
-    original_trace_number: {
-      type: DataTypes.STRING(64),
+    product_code: {
+      type: DataTypes.STRING(32),
       allowNull: true
     },
     is_refurbishable: {
@@ -37,16 +33,22 @@ module.exports = function(sequelize, DataTypes) {
     },
     ezadmin_management_number: {
       type: DataTypes.STRING(32),
-      allowNull: true
+      allowNull: true,
+      unique: "ezadmin_management_number"
     },
     musinsa_serial_number: {
       type: DataTypes.STRING(32),
+      allowNull: true,
+      unique: "musinsa_serial_number"
+    },
+    comment: {
+      type: DataTypes.TEXT,
       allowNull: true
     }
   }, {
     sequelize,
     tableName: 'return_inspection_list',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",
@@ -56,13 +58,22 @@ module.exports = function(sequelize, DataTypes) {
           { name: "id" },
         ]
       },
+      {
+        name: "musinsa_serial_number",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "musinsa_serial_number" },
+        ]
+      },
+      {
+        name: "ezadmin_management_number",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "ezadmin_management_number" },
+        ]
+      },
     ]
   });
-  return_inspection_list.associate = (models) => {
-    return_inspection_list.hasOne(models.musinsa_claim_list, {
-      foreignKey: 'musinsa_serial_number',
-      sourceKey: 'serial_number',
-      as: 'musinsa_claim_list_return_inspection_list'
-    });
-  }
 };

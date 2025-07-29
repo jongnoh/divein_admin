@@ -55,15 +55,4 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
-
-  
-  EzadminCsDetail.associate = (models) => {
-    EzadminCsDetail.belongsTo(models.ezadmin_return_claim, {
-      foreignKey: 'management_number',
-      targetKey: 'management_number',
-      as: 'management_number_ezadmin_return_claim'
-    });
-  };
-
-  return EzadminCsDetail;
 };

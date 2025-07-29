@@ -5,6 +5,7 @@ const cheerio = require('cheerio');
 
 const MusinsaRepository = require('../repositories/musinsa.repository.js');
 const EzAdminRepository = require('../repositories/ezadmin.repository.js');
+const DiveinRepository = require('../repositories/divein.repositoy.js');
 
 class DiveinService {
     constructor() {
@@ -16,8 +17,8 @@ class DiveinService {
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
     this.musinsaRepository = new MusinsaRepository();
     this.ezAdminRepository = new EzAdminRepository();
+    this.diveinRepository = new DiveinRepository();
 
-    
     // 다운로드 폴더가 없으면 생성
     if (!fs.existsSync(downloadPath)) {
       fs.mkdirSync(downloadPath, { recursive: true });
@@ -37,33 +38,16 @@ class DiveinService {
 
     upsertReturnInspectionList = async (reqData) => {
         try {
-            const { return_trace_number, ezadmin_management_number, musinsa_serial_number, is_refurbishable, is_repackaged } = reqData;
-            if(musinsa_serial_number){
-                const claimData = await this.musinsaRepository.findOneClaimBySerialNumber(musinsa_serial_number)
-                const musinsaProductName = claimData.product_name;
-                const musinsaProductOption = claimData.product_option
-                const product_code = await this.musinsaRepository.findProductCodeByNameAndOption(musinsaProductName, musinsaProductOption);
-                const result = await this.musinsaRepository.upsertReturnInspectionList({
-                    return_trace_number,
-                    ezadmin_management_number,
-                    musinsa_serial_number,
-                    is_refurbishable,
-                    is_repackaged,
-                    product_code
-                });
+            for (const key in reqData) {
+                reqData[key] === "" ? reqData[key] = null : reqData[key] = reqData[key]
             }
-            
-            
-            return {
-                success: true,
-                message: 'Return Inspection List가 성공적으로 저장되었습니다.',
-            };
+            const result = await this.diveinRepository.upsertReturnInspectionList(reqData);
+            return result;
         } catch (error) {
-            console.error('Return Inspection List 저장 오류:', error);
+            console.error('Error in upsertReturnInspectionList:', error);
             throw error;
         }
     }
-
 
     // CSV 값을 이스케이프 처리하는 헬퍼 메서드 (강화된 버전)
     escapeCsvValue = (value) => {
