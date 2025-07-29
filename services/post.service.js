@@ -80,11 +80,16 @@ class PostService {
     //     }
     // }
 
+
+
     getInfoByReturnOrOriginalTraceNumber = async (traceNumber) => {
         let result = await this.getInfoByReturnTraceNumber(traceNumber);
+        console.log(result)
             if(!result.success) {
             result = await this.getInfoByTraceNumber(traceNumber);
             }
+            
+            
             let returnValue = result.data.data.map(item => ({
             "반송장번호": item.return_trace_number,
             "판매처": item.channel,
@@ -110,13 +115,14 @@ class PostService {
     getInfoByReturnTraceNumber = async (returnTraceNumber) => {
         try {
             const originalTraceNumberResult = await this.getOriginalTraceNumber(returnTraceNumber);
+
             const originalTraceNumber = originalTraceNumberResult.originalTraceNumber;
 
 
             const result = await this.getInfoByTraceNumber(originalTraceNumber);
             return {
                 success: true,
-                data: result
+                data: result.data
             };
         } catch (error) {
             console.error('Get Info By Return Trace Number 오류:', error);
@@ -131,6 +137,8 @@ class PostService {
 
 
     getInfoByTraceNumber = async (originalTraceNumber) => {
+
+
         
         const result = await this.ezAdminRepository.findAllClaimsByTraceNumber(originalTraceNumber);
         for (const item of result) {
@@ -179,9 +187,17 @@ class PostService {
         getOriginalTraceNumber = async (returnTraceNumber) => {
             try {
             const response = await axios.get(`https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=${returnTraceNumber}`);
+            if(response.data.includes('반품원등기번호')) {
             const originalTraceNumber = response.data.split(`반품원등기번호:<a href=\"/trace.RetrieveDomRigiTraceList.comm?sid1=`)[1].slice(0, 13);
-            console.log('Original Trace Number:', originalTraceNumber);
+            
             return {originalTraceNumber : originalTraceNumber}
+            } else {
+                return {
+                    success: false,
+                    statusCode: 404,
+                    message: '유효한 원본 추적번호를 찾을 수 없습니다.'
+                };
+            }
                 } catch (error) {
             console.error('Get Original Trace Number 오류:', error);
             return {
