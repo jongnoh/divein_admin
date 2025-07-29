@@ -46,6 +46,8 @@ app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTrace
 app.post('/return/inspection', returnController.upsertReturnInspectionList);
 // 무신사 검수정보 조회
 app.get('/return/musinsa/inspection/', returnController.getMusinsaInspectionList);
+// 이지어드민 검수정보 조회 
+app.get('/return/ezAdmin/inspection/', returnController.getEzAdminInspectionList);
 //무신사 상품조회
 app.get('/return/musinsa/product/:productCode', musinsaController.getProductNameAndOptionByProductCode);
 

@@ -111,6 +111,22 @@ class ReturnController {
             });
         }
     }
+    getEzAdminInspectionList = async (req, res) => {
+        try {
+            const {startDate, endDate} = req.query;
+            const result = await this.ezAdminService.getEzAdminInspectionList(startDate, endDate);
+            res.status(result.statusCode || 200).json(result);
+        } catch (error) {
+            console.error('Get EzAdmin Inspection List 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
+
     getMusinsaCsListForReturn = async (req, res) => {
         try {
             let path = await this.diveinService.getMusinsaCsListPath()

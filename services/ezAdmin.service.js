@@ -3,6 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 const ExcelService = require('./divein.service.js');
 const option = require('../config/driver.option.js');
 const EzAdminRepository = require('../repositories/ezAdmin.repository.js');
+const DiveinRepository = require('../repositories/divein.repositoy.js');
 
 
 const EzAdminCsDTO = require('../dto/ezAdminCsDTO.js');
@@ -38,7 +39,7 @@ class EzAdminService {
     this.options
     this.downloadPath = downloadPath; // 나중에 사용할 수 있도록 저장
     this.csListPath = csListPath; // CSV 저장 경로
-
+    this.diveinRepository = new DiveinRepository();
     this.ezadminRepository = new EzAdminRepository();
     this.ezAdminCsDTO = EzAdminCsDTO
   }
@@ -126,6 +127,27 @@ class EzAdminService {
         success: false,
         statusCode: 500,
         message: '로그인 중 오류가 발생했습니다: ' + error.message,
+        error: error.message
+      };
+    }
+  }
+  getEzAdminInspectionList = async (startDate, endDate) => {
+    startDate = new Date(startDate);
+    endDate = new Date(endDate);
+    try {
+      const result = await this.diveinRepository.findEzAdminInspectionList(startDate, endDate);
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'EzAdmin 검수 리스트 조회 성공',
+        data: result
+      };
+    } catch (error) {
+      console.error('EzAdmin 검수 리스트 조회 중 오류:', error);
+      return {
+        success: false,
+        statusCode: 500,
+        message: 'EzAdmin 검수 리스트 조회 중 오류가 발생했습니다: ' + error.message,
         error: error.message
       };
     }
