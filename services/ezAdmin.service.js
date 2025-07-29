@@ -4,6 +4,7 @@ const ExcelService = require('./divein.service.js');
 const option = require('../config/driver.option.js');
 const EzAdminRepository = require('../repositories/ezAdmin.repository.js');
 
+
 const EzAdminCsDTO = require('../dto/ezAdminCsDTO.js');
 
     // 다운로드 경로 설정
@@ -138,6 +139,7 @@ class EzAdminService {
         const jsonData = await this.excelService.convertCsvToJson(csvData);
         const filteredData = await this.excelService.filterEmptyValuesFromJson(jsonData);
         const csDTOArray = filteredData.map(data => new EzAdminCsDTO(data));
+
         csDTOArray.forEach(async csDTO => {
             await this.ezadminRepository.upsertEzAdminReturnClaims(csDTO);
         });

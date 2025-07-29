@@ -1,5 +1,5 @@
 const sequelize = require('../config/database').sequelize;
-const { raw } = require('express');
+const { raw, Op, fn, col, where } = require('sequelize');
 const initModels = require('../models/init-models');
 
 class DiveinRepository {
@@ -35,6 +35,24 @@ async upsertReturnInspectionList(data) {
         });
     } catch (error) {
         console.error('Error in upsertReturnInspectionList:', error);
+        throw error;
+    }
+}
+
+async findMusinsaInspectionList(startDate, endDate) {
+    try {
+        const result = await this.models.return_inspection_list.findAll({
+            where: {
+                [Op.and]: [
+                    where(fn('DATE', col('createdAt')), { [Op.gte]: startDate }),
+                    where(fn('DATE', col('createdAt')), { [Op.lte]: endDate })
+                ]
+            },
+            raw: true
+        });
+        return result;
+    } catch (error) {
+        console.error('Error in findMusinsaInspectionList:', error);
         throw error;
     }
 }

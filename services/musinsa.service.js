@@ -12,6 +12,7 @@ const MusinsaCsDTO = require('../dto/musinsaCsDTO.js');
     const path = require('path');
     const fs = require('fs');
 const { error } = require('console');
+const DiveinRepository = require('../repositories/divein.repositoy.js');
     const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
     const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
 
@@ -29,6 +30,7 @@ class MusinsaService {
         this.options = options
 
         this.musinsaCsDTO = MusinsaCsDTO;
+        this.diveinRepository = new DiveinRepository();
 
             // 다운로드 경로 설정
     const path = require('path');
@@ -225,6 +227,8 @@ class MusinsaService {
 
 }));
 
+    
+
 
     if (!data) {
         throw error({
@@ -238,6 +242,19 @@ class MusinsaService {
             data: returnValue
         };
     }
+    }
+
+    getMusinsaInspectionList = async (startDate, endDate) => {
+        startDate = new Date(startDate)
+        endDate = new Date(endDate)
+        const data = await this.diveinRepository.findMusinsaInspectionList(startDate, endDate);
+        if (!data) {
+            throw new Error('검수정보가 없습니다.');
+        }
+        return {
+            success: true,
+            data: data
+        };
     }
 
     getProductNameAndOptionByProductCode = async (productCode) => {

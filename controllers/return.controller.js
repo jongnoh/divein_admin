@@ -94,7 +94,22 @@ class ReturnController {
             });
         }
     }
-
+    // 무신사 검수정보 조회
+    getMusinsaInspectionList = async (req, res) => {
+        try {
+            const {startDate, endDate} = req.query;
+            const result = await this.musinsaService.getMusinsaInspectionList(startDate, endDate);
+            res.status(result.statusCode || 200).json(result);
+        } catch (error) {
+            console.error('Get Musinsa Inspection List 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
     getMusinsaCsListForReturn = async (req, res) => {
         try {
             let path = await this.diveinService.getMusinsaCsListPath()

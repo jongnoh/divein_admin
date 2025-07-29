@@ -39,13 +39,13 @@ app.get('/musinsa/claimList', musinsaController.getClaimList);
 app.post('/ezAdmin/login', ezAdminController.login);
 app.post('/return/musinsa/process', musinsaController.processCheckList);
 // 반송장으로 원송장번호 조회
-//getTrace
-app.get('/return/post/trace/', postController.getTrace);
 app.get('/return/post/:returnTraceNumber', postController.getOriginalTraceNumber);
 // 통합 반품 정보 조회
 app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTraceNumber);
 // 통합 검수정보 입력
 app.post('/return/inspection', returnController.upsertReturnInspectionList);
+// 무신사 검수정보 조회
+app.get('/return/musinsa/inspection/', returnController.getMusinsaInspectionList);
 //무신사 상품조회
 app.get('/return/musinsa/product/:productCode', musinsaController.getProductNameAndOptionByProductCode);
 
