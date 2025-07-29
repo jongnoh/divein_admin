@@ -98,6 +98,7 @@ class ReturnController {
     getMusinsaInspectionList = async (req, res) => {
         try {
             const {startDate, endDate} = req.query;
+            console.log('Start Date:', startDate, 'End Date:', endDate);
             const result = await this.musinsaService.getMusinsaInspectionList(startDate, endDate);
             res.status(result.statusCode || 200).json(result);
         } catch (error) {

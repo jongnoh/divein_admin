@@ -45,8 +45,12 @@ async findMusinsaInspectionList(startDate, endDate) {
             where: {
                 [Op.and]: [
                     where(fn('DATE', col('createdAt')), { [Op.gte]: startDate }),
-                    where(fn('DATE', col('createdAt')), { [Op.lte]: endDate })
-                ]
+                    where(fn('DATE', col('createdAt')), { [Op.lte]: endDate }),
+
+                ],
+                musinsa_serial_number: {
+    [Op.ne]: null
+  }
             },
             raw: true
         });

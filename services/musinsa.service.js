@@ -247,10 +247,30 @@ class MusinsaService {
     getMusinsaInspectionList = async (startDate, endDate) => {
         startDate = new Date(startDate)
         endDate = new Date(endDate)
-        const data = await this.diveinRepository.findMusinsaInspectionList(startDate, endDate);
-        if (!data) {
+        const inspectionData = await this.diveinRepository.findMusinsaInspectionList(startDate, endDate);
+        if (!inspectionData) {
             throw new Error('검수정보가 없습니다.');
         }
+        let data = []
+        await Promise.all(inspectionData.map(async item => {
+            let claim = await this.musinsaRepository.findOneClaimBySerialNumber(item.musinsa_serial_number)
+            let product = await this.musinsaRepository.findOneProductNameAndOptionByProductCode(item.product_code)
+            data.push({
+                반송장번호: item.return_trace_number,
+                택배업체: claim.delivery_company,
+                상품코드: item.product_code,
+                상품명: product.product_name,
+                옵션: product.product_option,
+                주문번호: claim.order_number,
+                일련번호: claim.serial_number,
+                클레임번호 : claim.claim_number,
+                클레임사유: claim.claim_reason,
+                클레임상태: claim.claim_status,
+                양품화가능여부 : item.is_refurbishable === null? '' : 'O',
+                양품화여부 : item.is_repackaged? 'O' : 'X',
+                검수처리여부 : item.is_proceed? 'O' : 'X'
+            });
+        }))
         return {
             success: true,
             data: data
