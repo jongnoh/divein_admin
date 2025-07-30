@@ -44,7 +44,11 @@ module.exports = function(sequelize, DataTypes) {
     comment: {
       type: DataTypes.TEXT,
       allowNull: true
-    }
+    },
+    restoredAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
   }, {
     sequelize,
     tableName: 'return_inspection_list',

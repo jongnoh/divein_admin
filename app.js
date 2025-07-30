@@ -44,10 +44,12 @@ app.get('/return/post/:returnTraceNumber', postController.getOriginalTraceNumber
 app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTraceNumber);
 // 통합 검수정보 입력
 app.post('/return/inspection', returnController.upsertReturnInspectionList);
-// 무신사 검수정보 조회
+// 검수결과 조회 query startDate, endDate
 app.get('/return/musinsa/inspection/', returnController.getMusinsaInspectionList);
-// 이지어드민 검수정보 조회 
 app.get('/return/ezAdmin/inspection/', returnController.getEzAdminInspectionList);
+// 검수합격 리스트 query= startDate(YYYY-MM-DD string), endDate, refurbishable(T/F), repackaged(T/F), system(musinsa/ezadmin)
+app.get('/return/inspection/', returnController.getInspectionList);
+
 //무신사 상품조회
 app.get('/return/musinsa/product/:productCode', musinsaController.getProductNameAndOptionByProductCode);
 

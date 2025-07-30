@@ -725,5 +725,15 @@ decodeHtmlEntities(str) {
             throw error;
         }
     }
+
+    getInspectionList = async (objectData) => {
+        try {
+            const result = await this.diveinRepository.findAllInspectionList(objectData);
+            return result;
+        } catch (error) {
+            console.error('Error in getInspectionList:', error);
+            throw error;
+        }
+    }
 }
 module.exports = DiveinService;

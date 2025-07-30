@@ -112,6 +112,7 @@ class ReturnController {
             });
         }
     }
+    // ezAdmin 검수정보 조회
     getEzAdminInspectionList = async (req, res) => {
         try {
             const {startDate, endDate} = req.query;
@@ -127,7 +128,32 @@ class ReturnController {
             });
         }
     }
+    getInspectionList = async (req, res) => {
+        try {
+        const today = new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+        let {startDate = today,
+            endDate = today,
+            refurbishable = null, 
+            repackaged = null,
+            proceed = null,
+            system = null} = req.query;
 
+            refurbishable = refurbishable === null ? null : refurbishable === 'true'? true :false
+            repackaged = repackaged === null ? null :repackaged === 'true'? true : false
+            proceed = proceed === null ? null : proceed === 'true'? true : false
+
+            const result = await this.diveinService.getInspectionList({startDate, endDate, refurbishable, repackaged, proceed, system });
+            res.status(result.statusCode || 200).json(result);
+        }catch (error) {
+        console.error('Get Inspection List 오류:', error);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            statusCode: error.statusCode || 500,
+            message: error.message || 'Internal Server Error',
+            error: error.error || 'UNKNOWN_ERROR'
+        });
+    }}
+        
     getMusinsaCsListForReturn = async (req, res) => {
         try {
             let path = await this.diveinService.getMusinsaCsListPath()

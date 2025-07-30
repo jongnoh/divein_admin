@@ -81,6 +81,38 @@ async findEzAdminInspectionList(startDate, endDate) {
         throw error;
     }
 }
+async findAllInspectionList(objectData) {
+    try {
+        let {startDate, endDate, refurbishable, repackaged, proceed, system} = objectData;
+
+        const whereObject = {
+            [Op.and]: [
+                where(fn('DATE', col('createdAt')), { [Op.gte]: startDate }),
+                where(fn('DATE', col('createdAt')), { [Op.lte]: endDate }),
+            ],
+            ...(refurbishable !== null && refurbishable !== undefined ? { is_refurbishable: refurbishable } : {}),
+            ...(repackaged !== null && repackaged !== undefined ? { is_repackaged: repackaged } : {}),
+            ...(proceed !== null && proceed !== undefined ? { is_proceed: proceed } : {}),
+            ...(
+                system === 'ezadmin'
+                    ? { ezadmin_management_number: { [Op.ne]: null } }
+                    : system === 'musinsa'
+                    ? { musinsa_serial_number: { [Op.ne]: null } }
+                    : {}
+            ),
+        };
+
+        const result = await this.models.return_inspection_list.findAll({
+            whereObject,
+            raw: true
+        });
+        return result;
+    } catch (error) {
+        console.error('Error in findAllInspectionList:', error);
+        throw error;
+    }
+
+}
 }
 
 module.exports = DiveinRepository;
