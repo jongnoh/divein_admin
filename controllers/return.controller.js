@@ -72,6 +72,7 @@ class ReturnController {
     //통합 검수정보 입력
     upsertReturnInspectionList = async (req, res) => {
         try {
+            console.log('upsertReturnInspectionList 요청:', req.query);
             let data = req.query
             console.log(data.channel)
             data.channel = decodeURIComponent(data.channel);

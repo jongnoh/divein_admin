@@ -166,8 +166,8 @@ class MusinsaService {
 
     updateCsListForReturn = async (loginId,password,twoFactor) => {
         try{
-            await this.login(loginId,password,twoFactor)
-            await this.downloadClaimList();
+            // await this.login(loginId,password,twoFactor)
+            // await this.downloadClaimList();
             console.log('다운로드 완료')
             let jsonData = await this.excelService.convertExcelXmlToJson(path.join(this.downloadPath, 'export.xls'));
             //jsonData를 csList폴더에 저장
