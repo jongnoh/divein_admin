@@ -709,6 +709,104 @@ decodeHtmlEntities(str) {
         }
     }
 
+    parseHtmlTableToCsv = (fileName) => {
+    try {
+        console.log(`HTML 파일 파싱 시작: ${fileName}`);
+        const filePath = path.join(this.downloadPath, fileName);
+
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`파일을 찾을 수 없습니다: ${filePath}`);
+        }
+
+        const htmlContent = fs.readFileSync(filePath, 'utf8');
+        const $ = cheerio.load(htmlContent);
+
+        console.log('HTML 콘텐츠 로드 완료');
+
+        const table = $('table').first();
+        if (table.length === 0) {
+            throw new Error('HTML 파일에서 테이블을 찾을 수 없습니다.');
+        }
+
+        console.log('테이블 발견');
+
+        const csvRows = [];
+        let maxColumns = 0;
+
+        // 최대 열 수 계산
+        table.find('tr').each((_, row) => {
+            const columnCount = $(row).find('td, th').length;
+            if (columnCount > maxColumns) {
+                maxColumns = columnCount;
+            }
+        });
+
+        console.log(`최대 컬럼 수: ${maxColumns}`);
+
+        // 모든 행 파싱
+        table.find('tr').each((rowIndex, row) => {
+            const rowData = [];
+            const cells = $(row).find('td, th');
+
+            for (let colIndex = 0; colIndex < maxColumns; colIndex++) {
+                let cellValue = '';
+
+                if (colIndex < cells.length) {
+                    cellValue = cells.eq(colIndex).text().trim();
+
+                    // 특수 문자 정리
+                    cellValue = cellValue
+                        .replace(/\t/g, ' ')
+                        .replace(/\u00A0/g, ' ')
+                        .replace(/\u200B/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+
+                    // 긴 데이터, 특수 문자 로깅
+                    if (cellValue.length > 100) {
+                        console.log(`긴 데이터 발견 [행${rowIndex}, 열${colIndex}]: "${cellValue.substring(0, 100)}..."`);
+                    }
+                    if (cellValue.includes('\\') || cellValue.includes('\n') || cellValue.includes('\r')) {
+                        console.log(`특수 문자 포함 데이터 [행${rowIndex}, 열${colIndex}]: "${cellValue}"`);
+                    }
+                }
+
+                rowData.push(cellValue);
+            }
+
+            csvRows.push(rowData);
+
+            if (rowIndex === 0) {
+                console.log('헤더 행:', rowData.slice(0, 10));
+            } else if (rowIndex <= 3) {
+                console.log(`데이터 행 ${rowIndex}:`, rowData.slice(0, 5));
+            }
+        });
+
+        if (csvRows.length === 0) {
+            throw new Error('파싱할 데이터가 없습니다.');
+        }
+
+        const csvContent = csvRows.map((row, rowIndex) => {
+            return row.map((cell, colIndex) => {
+                const escaped = this.escapeCsvValue(cell);
+                if (rowIndex === 0 || (cell && cell.length > 100)) {
+                    console.log(`CSV 변환 [행${rowIndex}, 열${colIndex}]: "${cell}" → "${escaped}"`);
+                }
+                return escaped;
+            }).join(',');
+        }).join('\n');
+
+        console.log(`HTML 파싱 완료: ${fileName}, ${csvRows.length}행, ${maxColumns}열, CSV 길이: ${csvContent.length}자`);
+        return csvContent;
+
+    } catch (error) {
+        console.error(`HTML 파일 파싱 오류 (${fileName}):`, error);
+        throw error;
+    }
+}
+
+
     getMusinsaCsListPath = async () => {
         try {
             return path.join(this.csListPath, 'musinsa.xls')

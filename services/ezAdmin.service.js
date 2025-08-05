@@ -1,10 +1,10 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const ExcelService = require('./divein.service.js');
+const DiveinService = require('./divein.service.js');
 const option = require('../config/driver.option.js');
 const EzAdminRepository = require('../repositories/ezAdmin.repository.js');
 const DiveinRepository = require('../repositories/divein.repositoy.js');
-
+const transporter = require('../config/nodemailer.js');
 
 const EzAdminCsDTO = require('../dto/ezAdminCsDTO.js');
 
@@ -20,7 +20,7 @@ class EzAdminService {
 
   // Chrome 옵션을 클래스 레벨에서 설정
   constructor() {
-    this.excelService = new ExcelService();
+    this.diveinService = new DiveinService();
     this.options = option
 
 
@@ -158,8 +158,8 @@ class EzAdminService {
         await this.login(process.env.EZ_ADMIN_LOGIN_DOMAIN, process.env.EZ_ADMIN_LOGIN_ID, process.env.EZ_ADMIN_LOGIN_PW);
         const csvDataObject = await this.getCsListOfLastMonth()
         const csvData = csvDataObject.data
-        const jsonData = await this.excelService.convertCsvToJson(csvData);
-        const filteredData = await this.excelService.filterEmptyValuesFromJson(jsonData);
+        const jsonData = await this.diveinService.convertCsvToJson(csvData);
+        const filteredData = await this.diveinService.filterEmptyValuesFromJson(jsonData);
         const csDTOArray = filteredData.map(data => new EzAdminCsDTO(data));
 
         csDTOArray.forEach(async csDTO => {
@@ -229,8 +229,118 @@ class EzAdminService {
       };
     }
   }
+  emailStocksToFill= async () => {
+    let line = 10
+  const stocksToFill = await this.downloadStockList(line)
+  const csvData = await this.diveinService.parseHtmlTableToCsv(stocksToFill)
+  const jsonData = await this.diveinService.convertCsvToJson(csvData)
+
+  const propertyFilteredData = []
+  jsonData.forEach(item => {
+    propertyFilteredData.push({
+      "상품코드": item['상품코드'],
+      "상품명": item['상품명'],
+      "옵션": item['옵션'],
+      "재고": item['정상재고']
+    })
+  })
+  const productList = await this.diveinRepository.findAllProductsEzadmin()
+  const productsOnSale = productList.filter(product => product.is_on_sale == true);
+  const productsForEmail = propertyFilteredData.filter(item => {
+    return productsOnSale.some(product => product.product_code === item['상품코드']);
+  });
+
+  transporter.sendMail({
+    from: process.env.MAIL_USER_NAME,
+    to: process.env.MAIL_RECEIVER,
+    subject: new Date().toLocaleString() + ` 재고 ${line}개 이하 상품`,
+    html:`
+<p>재고 10 이하 상품입니다. :</p>
+<table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px">
+  <tr>
+    <th style="border:1px solid #ddd;padding:8px;background-color:#f2f2f2">상품코드</th>
+    <th style="border:1px solid #ddd;padding:8px;background-color:#f2f2f2">상품명</th>
+    <th style="border:1px solid #ddd;padding:8px;background-color:#f2f2f2">옵션</th>
+    <th style="border:1px solid #ddd;padding:8px;background-color:#f2f2f2">재고</th>
+  </tr>
+  ${productsForEmail.map(item => `
+  <tr>
+    <td style="border:1px solid #ddd;padding:8px">${item.상품코드}</td>
+    <td style="border:1px solid #ddd;padding:8px">${item.상품명}</td>
+    <td style="border:1px solid #ddd;padding:8px">${item.옵션}</td>
+    <td style="border:1px solid #ddd;padding:8px">${item.재고}</td>
+  </tr>`).join('')}
+</table>
+`
+
+  })
+  await this.clearDownloadFolder()
+  return productsForEmail
+  }
 
 
+
+
+  downloadStockList = async (endStock) => {
+    try {
+      await this.login(process.env.EZ_ADMIN_LOGIN_DOMAIN, process.env.EZ_ADMIN_LOGIN_ID, process.env.EZ_ADMIN_LOGIN_PW)
+
+      // 재고관리 페이지로 이동
+      await this.driver.get(`https://ga92.ezadmin.co.kr/template35.htm?template=I100`);
+      // 페이지 로딩 완료까지 기다림
+      await this.driver.wait(until.elementLocated(By.id('stock_end')), 15000);
+      // 재고수량 결정
+      await this.driver.findElement(By.id('stock_end')).sendKeys(`${endStock}`); // 재고수량 설정
+      await this.driver.findElement(By.id('search')).click(); // 검색 실행
+      await this.driver.wait(until.elementLocated(By.xpath('//*[@id="grid1"]/tbody/tr[1]')), 15000);
+      // 다운로드 클릭
+      await this.driver.findElement(By.id('download')).click();
+       //다운로드 팝업 대기
+            await this.driver.wait(until.elementLocated(By.id('pop_download_info')), 10000);
+            await this.driver.sleep(1200);
+            // 다운로드 신청 클릭
+            await this.driver.findElement(By.xpath('//*[@id="btn_download_info1"]')).click();
+      //다운로드센터 이동
+            await this.driver.get('https://ga92.ezadmin.co.kr/template40.htm?template=BL30')
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="0"]/td[6]')), 10000);
+            await this.driver.sleep(1000);
+
+            let loadGrid = async () => {
+                    for (let i = 0; i < 60; i++) {
+                        await this.driver.sleep(1000); // 1초 대기 후 다시 확인
+                        let filename = await this.driver.findElement(By.xpath('//*[@id="0"]/td[4]')).getText()
+
+
+
+                    if (filename == " " || !filename) {
+                        console.log('파일 생성 대기중... ' + i*2 + '초/60초');
+                        await this.driver.sleep(1000); // 1초 대기 후 다시 확인
+                    await this.driver.get('https://ga92.ezadmin.co.kr/template40.htm?template=BL30')
+                    }else {
+                        await this.driver.get(`https://ga21.ezadmin.co.kr/data/divein/${filename}`);
+                        console.log('파일 다운로드 완료');
+
+                        return filename
+                    }
+                }
+            }
+
+            let filename = await loadGrid()
+            await this.waitForDownload(filename);
+
+            return filename
+
+      
+    } catch (error) {
+      console.error('downloadStockList 오류:', error);
+      return {
+        success: false,
+        statusCode: 500,
+        message: '재고 조회 중 오류가 발생했습니다: ' + error.message,
+        error: error.message
+      };
+    }
+  }
 
   downloadCsListOfLastMonth = async () => {
     try {
@@ -330,8 +440,8 @@ class EzAdminService {
           getCsListOfLastMonth = async () => {
         try {
             let filename = (await this.downloadCsListOfLastMonth()).filename
-            let csvData = await this.excelService.parseHtmlToCsvForOrderList(filename)
-            let filteredData = await this.excelService.filterCsvDataForEzAdminReturn(csvData)
+            let csvData = await this.diveinService.parseHtmlToCsvForOrderList(filename)
+            let filteredData = await this.diveinService.filterCsvDataForEzAdminReturn(csvData)
             await this.clearDownloadFolder()
             return {
                 success: true,

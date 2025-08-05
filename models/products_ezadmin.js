@@ -18,6 +18,10 @@ module.exports = function(sequelize, DataTypes) {
     product_option: {
       type: DataTypes.STRING(100),
       allowNull: true
+    },
+    is_on_sale: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
     }
   }, {
     sequelize,

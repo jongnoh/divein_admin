@@ -6,6 +6,8 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 
+const cron = require('node-cron');
+
 // .env 파일 로드
 dotenv.config();
 
@@ -60,6 +62,9 @@ app.get('/return/musinsa/csList/claimNumber', musinsaController.updateClaimNumbe
 // csList 파일 요청
 app.get('/return/musinsa/csList', returnController.getMusinsaCsListForReturn);
 app.get('/return/ezAdmin/csList', returnController.getEzAdminCsListForReturn);
+// stock 다운로드
+app.get('/ezAdmin/stock', ezAdminController.downloadStockList);
+app.get('/ezAdmin/stock/email', ezAdminController.emailStocksToFill);
 
 const PORT = process.env.PORT || 3000;
 
@@ -77,4 +82,14 @@ app.listen(PORT, async () => {
   
 });
 
+
+cron.schedule('0 9 * * *', async () => {
+  try {
+    console.log('매일 오전 9시에 실행되는 작업 시작');
+    await ezAdminController.emailStocksToFill();
+    console.log('재고 이메일 전송 완료');
+  } catch (error) {
+    console.error('재고 이메일 전송 중 오류 발생:', error);
+  }
+});
 

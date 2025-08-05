@@ -111,7 +111,17 @@ async findAllInspectionList(objectData) {
         console.error('Error in findAllInspectionList:', error);
         throw error;
     }
-
+}
+async findAllProductsEzadmin() {
+    try {
+        const result = await this.models.products_ezadmin.findAll({
+            raw: true
+        });
+        return result;
+    } catch (error) {
+        console.error('Error in findAllProductsEzadmin:', error);
+        throw error;
+    }
 }
 }
 

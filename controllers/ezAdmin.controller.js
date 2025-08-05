@@ -41,6 +41,35 @@ class EzAdminController {
             });
         }
     }
+
+    downloadStockList = async (req, res) => {
+        try {
+            const result = await this.ezAdminService.downloadStockList();
+            res.status(200).json(result);
+        } catch (error) {
+            console.error('Download Stock List 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
+    emailStocksToFill = async (req, res) => {
+        try {
+            const result = await this.ezAdminService.emailStocksToFill();
+            res.status(200).json(result);
+        } catch (error) {
+            console.error('Email Stocks To Fill 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
 }
 
 module.exports = EzAdminController;
