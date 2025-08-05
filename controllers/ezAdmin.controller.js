@@ -59,7 +59,7 @@ class EzAdminController {
     emailStocksToFill = async (req, res) => {
         try {
             const result = await this.ezAdminService.emailStocksToFill();
-            res.status(200).json(result);
+            return res.status(200).json(result);
         } catch (error) {
             console.error('Email Stocks To Fill 오류:', error);
             res.status(error.statusCode || 500).json({
