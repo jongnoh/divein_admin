@@ -1,4 +1,4 @@
-const EzAdminService = require('../services/ezAdmin.service');
+const EzAdminService = require('../services/ezadmin.service');
 const dotenv = require('dotenv');
 dotenv.config();
 

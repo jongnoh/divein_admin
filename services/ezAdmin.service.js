@@ -2,7 +2,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const DiveinService = require('./divein.service.js');
 const option = require('../config/driver.option.js');
-const EzAdminRepository = require('../repositories/ezAdmin.repository.js');
+const EzAdminRepository = require('../repositories/ezadmin.repository.js');
 const DiveinRepository = require('../repositories/divein.repositoy.js');
 const transporter = require('../config/nodemailer.js');
 

@@ -1,7 +1,7 @@
 
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const EzAdminService = require('./ezAdmin.service.js');
+const EzAdminService = require('./ezadmin.service.js');
 const EzAdminRepository = require('../repositories/ezadmin.repository.js');
 const fs = require('fs');
 const path = require('path');
