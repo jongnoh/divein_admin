@@ -1,6 +1,6 @@
 const MusinsaService = require('../services/musinsa.service');
 const PostService = require('../services/post.service');
-const EzAdminService = require('../services/ezAdmin.service');
+const EzAdminService = require('../services/ezadmin.service');
 const DiveinService = require('../services/divein.service');
 
 class ReturnController {
