@@ -342,6 +342,13 @@ class MusinsaService {
                     message: '먼저 로그인을 진행하세요.'
                 };
             }
+            if(!serialNumber || !claimNumber) {
+                return {
+                    success: false,
+                    statusCode: 400,
+                    message: '일련번호와 클레임번호가 모두 있어야 합니다.'
+                };
+            }
         await this.driver.get(`https://bizest.musinsa.com/po/order-group-admin/popup/pop_return_success?ORD_OPT_NO=${serialNumber}&CLM_NO=${claimNumber}&PROVIDER=HO&LAYOUT_TYPE=popup`);
             // 페이지 로딩 완료까지 기다림
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="content"]')), 15000);
