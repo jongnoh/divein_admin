@@ -4,36 +4,11 @@ const path = require('path');
 const cheerio = require('cheerio');
 
 const MusinsaRepository = require('../repositories/musinsa.repository.js');
-const EzAdminRepository = require('../repositories/ezadmin.repository.js');
 const DiveinRepository = require('../repositories/divein.repositoy.js');
 
 class DiveinService {
     constructor() {
-
-           // 다운로드 경로 설정
-    const path = require('path');
-    const fs = require('fs');
-    const downloadPath = path.join(__dirname, '../downloads'); // 프로젝트 루트의 downloads 폴더
-    const csListPath = path.join(__dirname, '../csList'); // CSV 저장 폴더
-    this.musinsaRepository = new MusinsaRepository();
-    this.ezAdminRepository = new EzAdminRepository();
     this.diveinRepository = new DiveinRepository();
-
-    // 다운로드 폴더가 없으면 생성
-    if (!fs.existsSync(downloadPath)) {
-      fs.mkdirSync(downloadPath, { recursive: true });
-      console.log('다운로드 폴더 생성:', downloadPath);
-    }
-    
-    // cslist 폴더가 없으면 생성
-    if (!fs.existsSync(csListPath)) {
-      fs.mkdirSync(csListPath, { recursive: true });
-      console.log('cslist 폴더 생성:', csListPath);
-    }
-      
-    this.downloadPath = downloadPath; // 나중에 사용할 수 있도록 저장
-    this.csListPath = csListPath; // CSV 저장 경로
-    
     }
 
     upsertReturnInspectionList = async (reqData) => {

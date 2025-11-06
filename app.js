@@ -1,12 +1,5 @@
 const express = require('express');
-
-const router = express.Router();
-
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-
-const cron = require('node-cron');
 
 // .env 파일 로드
 dotenv.config();
@@ -25,46 +18,13 @@ app.use('/static', express.static('static'));
 
 const MusinsaController = require('./controllers/musinsa.controller.js');
 const PostController = require('./controllers/post.controller.js');
-const ReturnController = require('./controllers/return.controller.js');
-const EzAdminController = require('./controllers/ezAdmin.controller.js');
-
 const musinsaController = new MusinsaController();
 const postController = new PostController();
-const returnController = new ReturnController();
-const ezAdminController = new EzAdminController();
 
 app.get('/', (req, res) => {res.send('Hello World!');});
 
-app.get('/return/musinsa/claimNumber/:orderNumber/:serialNumber', musinsaController.getClaimNumber);
 app.post('/musinsa/login', musinsaController.login);
-app.get('/musinsa/claimList', musinsaController.getClaimList);
-app.post('/ezAdmin/login', ezAdminController.login);
-app.post('/return/musinsa/process', musinsaController.processCheckList);
-// 반송장으로 원송장번호 조회
-app.get('/return/post/:returnTraceNumber', postController.getOriginalTraceNumber);
-// 통합 반품 정보 조회
-app.get('/return/info/:returnTraceNumber', returnController.getInfoByReturnTraceNumber);
-// 통합 검수정보 입력
-app.post('/return/inspection', returnController.upsertReturnInspectionList);
-// 검수결과 조회 query startDate, endDate
-app.get('/return/musinsa/inspection/', returnController.getMusinsaInspectionList);
-app.get('/return/ezAdmin/inspection/', returnController.getEzAdminInspectionList);
-// 검수합격 리스트 query= startDate(YYYY-MM-DD string), endDate, refurbishable(T/F), repackaged(T/F), system(musinsa/ezadmin)
-app.get('/return/inspection/', returnController.getInspectionList);
-
-//무신사 상품조회
-app.get('/return/musinsa/product/:productCode', musinsaController.getProductNameAndOptionByProductCode);
-
-// 서버내 csList 업데이트
-app.post('/return/musinsa/csList', musinsaController.updateCsList);
-app.post('/return/ezAdmin/csList', ezAdminController.updateCsList);
-app.get('/return/musinsa/csList/claimNumber', musinsaController.updateClaimNumber);
-// csList 파일 요청
-app.get('/return/musinsa/csList', returnController.getMusinsaCsListForReturn);
-app.get('/return/ezAdmin/csList', returnController.getEzAdminCsListForReturn);
-// stock 다운로드
-app.get('/ezAdmin/stock', ezAdminController.downloadStockList);
-app.get('/ezAdmin/stock/email', ezAdminController.emailStocksToFill);
+app.post('/musinsa/refresh-token', musinsaController.refreshAccessToken);
 
 const PORT = process.env.PORT || 3000;
 
@@ -82,14 +42,4 @@ app.listen(PORT, async () => {
   
 });
 
-
-cron.schedule('0 8 * * *', async () => {
-  try {
-    console.log('매일 오전 8시에 실행되는 작업 시작');
-    await ezAdminController.emailStocksToFill();
-    console.log('재고 이메일 전송 완료');
-  } catch (error) {
-    console.error('재고 이메일 전송 중 오류 발생:', error);
-  }
-});
 
