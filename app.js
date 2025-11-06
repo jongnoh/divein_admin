@@ -83,9 +83,9 @@ app.listen(PORT, async () => {
 });
 
 
-cron.schedule('0 9 * * *', async () => {
+cron.schedule('0 8 * * *', async () => {
   try {
-    console.log('매일 오전 9시에 실행되는 작업 시작');
+    console.log('매일 오전 8시에 실행되는 작업 시작');
     await ezAdminController.emailStocksToFill();
     console.log('재고 이메일 전송 완료');
   } catch (error) {

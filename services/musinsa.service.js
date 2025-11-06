@@ -1,7 +1,7 @@
 const MusinsaRepository = require('../repositories/musinsa.repository.js');
 const {Builder, By, Key, until, Actions} = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const EzAdminService = require('./ezAdmin.service.js');
+const EzAdminService = require('./ezadmin.service.js');
 const ExcelService = require('./divein.service.js');
 
 const options = require('../config/driver.option.js');
@@ -340,6 +340,13 @@ class MusinsaService {
                     success: false,
                     statusCode: 401,
                     message: '먼저 로그인을 진행하세요.'
+                };
+            }
+            if(!serialNumber || !claimNumber) {
+                return {
+                    success: false,
+                    statusCode: 400,
+                    message: '일련번호와 클레임번호가 모두 있어야 합니다.'
                 };
             }
         await this.driver.get(`https://bizest.musinsa.com/po/order-group-admin/popup/pop_return_success?ORD_OPT_NO=${serialNumber}&CLM_NO=${claimNumber}&PROVIDER=HO&LAYOUT_TYPE=popup`);
