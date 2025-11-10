@@ -4,6 +4,15 @@ class MusinsaController  {
     constructor() {
         this.musinsaService = new MusinsaService();
     }
+    autoLogin = async() => {
+        try {
+            const loginId = process.env.MUSINSA_ID;
+            const password = process.env.MUSINSA_PW;
+            await this.musinsaService.login(loginId, password);
+        } catch (error) {
+            console.error('Auto Login 오류:', error);
+        }
+    }
     login = async (req, res) => {
         try {
 

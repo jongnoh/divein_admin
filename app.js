@@ -43,6 +43,10 @@ app.listen(PORT, async () => {
   
 });
 
+if(!musinsaController.musinsaService.cookie){
+  musinsaController.autoLogin();
+
+}
 
 // cron.schedule('0 0 * * *', async () => {
 //     console.log('매일 자정에 무신사 로그인 작업 시작');
