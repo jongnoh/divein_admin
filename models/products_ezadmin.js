@@ -21,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     is_on_sale: {
       type: DataTypes.BOOLEAN,
-      allowNull: true,
+      allowNull: true
     }
   }, {
     sequelize,

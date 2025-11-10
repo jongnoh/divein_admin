@@ -1,6 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
-
+const cron = require('node-cron');
 // .env 파일 로드
 dotenv.config();
 
@@ -25,6 +25,7 @@ app.get('/', (req, res) => {res.send('Hello World!');});
 
 app.post('/musinsa/login', musinsaController.login);
 app.post('/musinsa/refresh-token', musinsaController.refreshAccessToken);
+app.get('/musinsa/update-claims', musinsaController.updateClaims);
 
 const PORT = process.env.PORT || 3000;
 
@@ -40,6 +41,17 @@ testConnection()
 app.listen(PORT, async () => {
   console.log(`Server listening on port ${PORT}`);
   
+});
+
+
+cron.schedule('0 0 * * *', async () => {
+    console.log('매일 자정에 무신사 로그인 작업 시작');
+    try {
+        await musinsaController.login();
+        console.log('무신사 로그인 작업 완료');
+    } catch (error) {
+        console.error('무신사 로그인 작업 중 오류 발생:', error);
+    }
 });
 
 

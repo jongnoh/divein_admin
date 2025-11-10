@@ -1,3 +1,5 @@
+const speakeasy = require('speakeasy');
+
 const MusinsaRepository = require('../repositories/musinsa.repository.js');
 const ExcelService = require('./divein.service.js');
 
@@ -6,7 +8,7 @@ const { error } = require('console');
 const DiveinRepository = require('../repositories/divein.repositoy.js');
 const { default: axios, get } = require('axios');
 const { ref } = require('process');
-
+const dateUtils = require('../utils/date.js');
 
 
 class MusinsaService {
@@ -15,17 +17,20 @@ class MusinsaService {
         this.musinsaRepository = new MusinsaRepository();
         this.musinsaCsDTO = MusinsaCsDTO;
         this.diveinRepository = new DiveinRepository();
+        this.dateUtils = new dateUtils();
 
         this.cookie = null;
         this.accessToken = null;
         this.refreshToken = null;
         this.partner_platform_atk = null;
         this.partner_platform_rtk = null;
+        
 
     }
-    login = async (loginId, pw , twoFactor) => {
+    login = async (loginId, pw) => {
         try {
             let cookie;
+            //id 비밀번호 로그인
             const login = await axios({
                 method: 'post',
                 url: 'https://api.dashboard.partner.musinsa.com/auth/login',
@@ -45,7 +50,14 @@ class MusinsaService {
                 maxRedirects: 0
             })
             cookie = login.headers['set-cookie'].join('; ')
-            //id 로그인
+            //OTP 로그인
+
+            const twoFactor = await speakeasy.totp({
+                secret: process.env.OTP_SECRET,
+                encoding: 'base32'
+            });
+
+
             const twoFactorVerification = await axios({
                 method: 'post',
                 url: 'https://api.dashboard.partner.musinsa.com/auth/otp/verification',
@@ -68,7 +80,7 @@ class MusinsaService {
             this.cookie = cookie
             const authcode = twoFactorVerification.data.ssoUuid
             const refreshToken = twoFactorVerification.data.refreshToken
-            //2차 인증
+            //Oauth 인증
             const OAuth = await axios({
                 method: 'post',
                 url: 'https://api.one.musinsa.com/api2/partner/oauth/token',
@@ -166,6 +178,7 @@ class MusinsaService {
             this.accessToken = getAccessToken.data.accessToken
             this.refreshToken = getAccessToken.data.refreshToken
             this.cookie = getAccessToken.headers['set-cookie'].join('; ')
+            console.log(this.cookie)
             return {
                 success: true,
                 statusCode: 200,
@@ -182,5 +195,63 @@ class MusinsaService {
             }
     }
 
+    updateClaims = async (startDate, endDate) => {
+        try {
+            if(!startDate || !endDate) {
+                startDate = this.dateUtils.getKSTDateString();
+                endDate = this.dateUtils.getKSTDateString();
+            }
+            console.log(startDate)
+            console.log(endDate)
+
+            let formData = new FormData();
+            formData.append('MENU_ID', '/po/order-group-admin/order/ord06');
+            formData.append('USR_SEARCH_ITEM_CNT', '12');
+            formData.append('PAGE_CNT', '10');
+            formData.append('LIMIT', '100');
+            formData.append('PAGE', '1');
+            formData.append('CHECKED_LOGISTICS_BUSINESS_TYPE', 'PARTNER,MFS,MWP,M1P');
+            formData.append('S_DATE_TYPE', '10');
+            formData.append('S_SDATE', startDate);
+            formData.append('S_EDATE', endDate);
+            formData.append('S_CLM_DELAY_DAYS', '0');
+            formData.append('S_RETURN_STATE', '0');
+            formData.append('S_RETURN_STATE', '7');
+            formData.append('S_RETURN_STATE', '2');
+            formData.append('S_CLM_REQ_DAYS', '0');
+            formData.append('S_CLM_DLV_DAYS', '0');
+            formData.append('S_NOT_COMPLEX', 'Y');
+            formData.append('S_LOGISTICS_BUSINESS_TYPE_ALL', 'ALL');
+            formData.append('S_LOGISTICS_BUSINESS_TYPE', 'PARTNER');
+            formData.append('S_LOGISTICS_BUSINESS_TYPE', 'NFS');
+            formData.append('S_LOGISTICS_BUSINESS_TYPE', 'MWP');
+            formData.append('S_LOGISTICS_BUSINESS_TYPE', 'M1P');
+            formData.append('LIMIT', '2000');
+            formData.append('CHECHED_RETURN_STATE', '0,7,2');
+
+
+            const claimResponse = await axios({
+                method: 'post',
+                url: 'https://bizest.musinsa.com/po/order-group-admin/api/order/ord06/search',
+                data: formData,
+                headers: {
+                'cookie': this.cookie
+                }
+                
+            })
+            const data = claimResponse.data.data.map(async (item) => 
+                await this.musinsaRepository.upsertClaims(new this.musinsaCsDTO(item))
+            )
+            return { success: true,
+                statusCode: 200,
+                message: '무신사 클레임 내역을 성공적으로 가져왔습니다.',
+                data: data
+            };
+            // const result = await this.musinsaRepository.upsertClaims()
+        } catch (error) {
+            throw new Error('무신사 클레임 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+    
 }
 module.exports = MusinsaService;

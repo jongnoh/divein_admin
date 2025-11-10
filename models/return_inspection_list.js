@@ -48,7 +48,7 @@ module.exports = function(sequelize, DataTypes) {
     restoredAt: {
       type: DataTypes.DATE,
       allowNull: true
-    },
+    }
   }, {
     sequelize,
     tableName: 'return_inspection_list',
