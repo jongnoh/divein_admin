@@ -4,7 +4,6 @@ class dateUtils
     getKSTDateString() {
     let today = new Date().toLocaleDateString("ja-jp");
     today = today.replace("/", "-").replace("/", "-");
-    console.log(today)
     return today;
 }
 getLatestMonday() {

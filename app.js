@@ -44,14 +44,22 @@ app.listen(PORT, async () => {
 });
 
 
-cron.schedule('0 0 * * *', async () => {
-    console.log('매일 자정에 무신사 로그인 작업 시작');
-    try {
-        await musinsaController.login();
-        console.log('무신사 로그인 작업 완료');
-    } catch (error) {
-        console.error('무신사 로그인 작업 중 오류 발생:', error);
-    }
-});
+// cron.schedule('0 0 * * *', async () => {
+//     console.log('매일 자정에 무신사 로그인 작업 시작');
+//     try {
+//         await musinsaController.login();
+//         console.log('무신사 로그인 작업 완료');
+//     } catch (error) {
+//         console.error('무신사 로그인 작업 중 오류 발생:', error);
+//     }
+// });
+// cron.schedule('*/3 * * * *', async () => {
+//     console.log('매 3분마다 무신사 토큰 갱신');
+//     try {
 
-
+//         await musinsaController.refreshAccessToken();
+//         console.log('무신사 토큰 갱신 완료');
+//     } catch (error) {
+//         console.error('무신사 토큰 갱신 중 오류 발생:', error);
+//     }
+// });
