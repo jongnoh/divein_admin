@@ -102,7 +102,7 @@ class MusinsaService {
             this.partner_platform_atk = OAuth.headers['set-cookie'].find(cookie => cookie.startsWith('partner-platform-atk')).split(';')[0].split('=')[1];
             this.partner_platform_rtk = OAuth.headers['set-cookie'].find(cookie => cookie.startsWith('partner-platform-rtk')).split(';')[0].split('=')[1];
             this.refreshToken = refreshToken.trim()
-            //accessToken 발급
+            // accessToken 발급
             const getAccessToken = await axios({
                 method: 'post',
                 url: 'https://api.dashboard.partner.musinsa.com/auth/refresh-access-token',

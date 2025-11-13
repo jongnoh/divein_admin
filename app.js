@@ -25,7 +25,7 @@ app.get('/', (req, res) => {res.send('Hello World!');});
 
 app.post('/musinsa/login', musinsaController.login);
 app.post('/musinsa/refresh-token', musinsaController.refreshAccessToken);
-app.get('/musinsa/update-claims', musinsaController.updateClaims);
+app.post('/musinsa/update-claims', musinsaController.updateClaims);
 
 const PORT = process.env.PORT || 3000;
 
@@ -45,25 +45,8 @@ app.listen(PORT, async () => {
 
 if(!musinsaController.musinsaService.cookie){
   musinsaController.autoLogin();
-
 }
-
-// cron.schedule('0 0 * * *', async () => {
-//     console.log('매일 자정에 무신사 로그인 작업 시작');
-//     try {
-//         await musinsaController.login();
-//         console.log('무신사 로그인 작업 완료');
-//     } catch (error) {
-//         console.error('무신사 로그인 작업 중 오류 발생:', error);
-//     }
-// });
-// cron.schedule('*/3 * * * *', async () => {
-//     console.log('매 3분마다 무신사 토큰 갱신');
-//     try {
-
-//         await musinsaController.refreshAccessToken();
-//         console.log('무신사 토큰 갱신 완료');
-//     } catch (error) {
-//         console.error('무신사 토큰 갱신 중 오류 발생:', error);
-//     }
-// });
+// 매일 24시간마다 무신사 자동 로그인 실행
+cron.schedule('*/24 * * * *', () => {
+  musinsaController.autoLogin();  
+})
