@@ -195,15 +195,17 @@ class MusinsaService {
             }
     }
 
-    updateClaims = async (startDate, endDate) => {
+    getClaimsByDate = async (startDate, endDate, returnTraceNumber, orderNumber) => {
         try {
-            console.log('무신사 클레임 내역 업데이트 시작');
-            if(!startDate || !endDate) {
+            console.log('무신사 클레임 내역 조회 시작');
+            if(!startDate) {
                 startDate = this.dateUtils.getKSTDateStringOfTwoWeeksAgo();
+            }
+            if(!endDate) {
                 endDate = this.dateUtils.getKSTDateString();
             }
-            console.log(startDate)
-            console.log(endDate)
+            console.log(startDate+ '부터')
+            console.log(endDate+ '까지')
 
             let formData = new FormData();
             formData.append('MENU_ID', '/po/order-group-admin/order/ord06');
@@ -215,10 +217,13 @@ class MusinsaService {
             formData.append('S_DATE_TYPE', '10');
             formData.append('S_SDATE', startDate);
             formData.append('S_EDATE', endDate);
+            formData.append('S_ORD_NO', orderNumber || '');
             formData.append('S_CLM_DELAY_DAYS', '0');
             formData.append('S_RETURN_STATE', '0');
             formData.append('S_RETURN_STATE', '7');
+            formData.append('S_RETURN_STATE', '3');
             formData.append('S_RETURN_STATE', '2');
+            formData.append('S_RET_DLV_NO', returnTraceNumber || '');
             formData.append('S_CLM_REQ_DAYS', '0');
             formData.append('S_CLM_DLV_DAYS', '0');
             formData.append('S_NOT_COMPLEX', 'Y');
@@ -227,8 +232,8 @@ class MusinsaService {
             formData.append('S_LOGISTICS_BUSINESS_TYPE', 'NFS');
             formData.append('S_LOGISTICS_BUSINESS_TYPE', 'MWP');
             formData.append('S_LOGISTICS_BUSINESS_TYPE', 'M1P');
-            formData.append('LIMIT', '2000');
-            formData.append('CHECHED_RETURN_STATE', '0,7,2');
+            formData.append('LIMIT', '9999');
+            formData.append('CHECHED_RETURN_STATE', '0,7,3,2');
 
 
             const claimResponse = await axios({
@@ -240,26 +245,44 @@ class MusinsaService {
                 }
                 
             })
-            const data = Promise.resolve(claimResponse.data.data.map(async (item) =>
-                await this.musinsaRepository.upsertClaims(new this.musinsaCsDTO(item))
-            ))
+
+            console.log(`무신사 클레임 내역 ${claimResponse.data.data.length}건 조회`);
             return { success: true,
                 statusCode: 200,
-                message: '무신사 클레임 내역을 성공적으로 가져왔습니다.',
-                data: data
+                message: `무신사 클레임 내역 ${claimResponse.data.data.length}건이 성공적으로 조회되었습니다.`,
+                dataLength: claimResponse.data.data.length,
+                data: claimResponse.data.data
             };
-            // const result = await this.musinsaRepository.upsertClaims()
         } catch (error) {
             throw new Error('무신사 클레임 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
         }
     }
-
-    getClaimByReturnTraceNumber = async (returnTraceNumber) => {
+    getClaimDetail = async (orderNumber, orderOptNumber) => {
         try {
-            const claims =  await this.musinsaRepository.findAllClaimByReturnTraceNumber(returnTraceNumber);
-            return claims;
+            console.log(`orderNumber: ${orderNumber}, orderOptNumber: ${orderOptNumber} detail 요청 중`);
+            let formData = new FormData();
+            formData.append('ORD_NO', orderNumber);
+            formData.append('ORD_OPT_NO', orderOptNumber);
+            const claimDetailResponse = await axios({
+                method: 'post',
+                url: 'https://bizest.musinsa.com/po/order-group-admin/api/order/ord01/get_detail',
+                data: formData,
+                headers: {
+                'cookie': this.cookie
+                }
+            })
+            const details = claimDetailResponse.data.claim.ROWS_CLAIM
+            let memos = []
+            details.forEach(detail => {
+                memos.push({
+                    "memo" : detail.memo,
+                    "date" : detail.regi_date
+                    })
+            })
+            return memos;
+
         } catch (error) {
-            throw new Error('Get Claim By Return Trace Number 오류: ' + error.message);
+            throw new Error('무신사 클레임 상세 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
         }
     }
 }

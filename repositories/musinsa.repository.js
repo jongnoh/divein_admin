@@ -16,7 +16,6 @@ class MusinsaRepository {
             const result = await this.models.musinsa_claims.upsert(
                 data
                 , { ignoreDuplicates: true });
-            console.log('Upsert musinsa_claims 성공:', result.length);
             return result;
         } catch (error) {
             console.error('Error in upsertMusinsaCClaims:', error);
