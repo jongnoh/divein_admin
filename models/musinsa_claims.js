@@ -10,6 +10,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: true
     },
+    delivery_company: {
+      type: DataTypes.STRING(50),
+      allowNull: true
+    },
+    return_trace_number: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
     product_name: {
       type: DataTypes.STRING(100),
       allowNull: true

@@ -17,6 +17,8 @@ class MusinsaCsDTO {
         this.goods_no = data['goods_no'];
         this.closed_date = data['dlv_date'];
         this.memo = data['memo'];
+        this.delivery_company = data['dlv_cm'];
+        this.return_trace_number = data['dlv_no'];
     }
     exportObject() {
         return {
@@ -36,7 +38,9 @@ class MusinsaCsDTO {
             goods_no: this.goods_no,
             order_status: this.order_status,
             closed_date: this.closed_date,
-            memo: this.memo
+            memo: this.memo,
+            delivery_company: this.delivery_company,
+            return_trace_number: this.return_trace_number,
         };
     }
 }

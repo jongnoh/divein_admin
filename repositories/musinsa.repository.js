@@ -23,7 +23,18 @@ class MusinsaRepository {
             throw error;
         }
     }
-
-
+    async findAllClaimByReturnTraceNumber(returnTraceNumber) {
+        try {
+            const claims = await this.models.musinsa_claims.findAll({
+                where: {
+                    return_trace_number: returnTraceNumber
+                }
+            });
+            return claims;
+        } catch (error) {
+            console.error('Error in findAllClaimByReturnTraceNumber:', error);
+            throw error;
+        }
+    }
 }
 module.exports = MusinsaRepository;

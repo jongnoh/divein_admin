@@ -4,11 +4,11 @@ class MusinsaController  {
     constructor() {
         this.musinsaService = new MusinsaService();
     }
-    autoLogin = async() => {
+    autoLogin = async () => {
         try {
             const loginId = process.env.MUSINSA_ID;
             const password = process.env.MUSINSA_PW;
-            await this.musinsaService.login(loginId, password);
+            const result = await this.musinsaService.login(loginId, password);
         } catch (error) {
             console.error('Auto Login 오류:', error);
         }
@@ -54,20 +54,6 @@ class MusinsaController  {
             });
         }
     }
-    getClaims = async (req, res) => {
-        try {
-            const result = await this.musinsaService.getClaims();
-            res.status(result.statusCode || 200).json(result);
-        } catch (error) {
-            console.error('Get Claims 오류:', error);
-            res.status(error.statusCode || 500).json({
-                success: false,
-                statusCode: error.statusCode || 500,
-                message: error.message || 'Internal Server Error',
-                error: error.error || 'UNKNOWN_ERROR'
-            });
-        }
-    }
     updateClaims = async (req, res) => {
         try {
             const result = await this.musinsaService.updateClaims();
@@ -81,6 +67,36 @@ class MusinsaController  {
                 error: error.error || 'UNKNOWN_ERROR'
             });
         }
+    }
+    getClaimByReturnTraceNumber = async (req, res) => {
+        try {
+            const returnTraceNumber = req.params.returnTraceNumber;
+            console.log('Return Trace Number:', returnTraceNumber);
+            const result = await this.musinsaService.getClaimByReturnTraceNumber(returnTraceNumber);
+            res.status(result.statusCode || 200).json(result);
+        } catch (error) {
+            console.error('Get Claim By Return Trace Number 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
+    processClaim = async (req, res) => {
+        try {
+            const {claim_number, order_opt_number} = req.query
+            res.status(200).json({ success: true, message: '클레임이 성공적으로 처리되었습니다.' });
+        } catch (error) {
+            console.error('Process Claim 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }  
     }
 }
 module.exports = MusinsaController;

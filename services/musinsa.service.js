@@ -128,6 +128,7 @@ class MusinsaService {
         
             this.cookie = getAccessToken.headers['set-cookie'].join('; ')
 
+            console.log('로그인 성공! ID:', loginId);
             if(this.accessToken && this.refreshToken ){
                 return {
                     success: true,
@@ -178,7 +179,6 @@ class MusinsaService {
             this.accessToken = getAccessToken.data.accessToken
             this.refreshToken = getAccessToken.data.refreshToken
             this.cookie = getAccessToken.headers['set-cookie'].join('; ')
-            console.log(this.cookie)
             return {
                 success: true,
                 statusCode: 200,
@@ -197,8 +197,9 @@ class MusinsaService {
 
     updateClaims = async (startDate, endDate) => {
         try {
+            console.log('무신사 클레임 내역 업데이트 시작');
             if(!startDate || !endDate) {
-                startDate = this.dateUtils.getKSTDateString();
+                startDate = this.dateUtils.getKSTDateStringOfTwoWeeksAgo();
                 endDate = this.dateUtils.getKSTDateString();
             }
             console.log(startDate)
@@ -239,9 +240,9 @@ class MusinsaService {
                 }
                 
             })
-            const data = claimResponse.data.data.map(async (item) => 
+            const data = Promise.resolve(claimResponse.data.data.map(async (item) =>
                 await this.musinsaRepository.upsertClaims(new this.musinsaCsDTO(item))
-            )
+            ))
             return { success: true,
                 statusCode: 200,
                 message: '무신사 클레임 내역을 성공적으로 가져왔습니다.',
@@ -252,6 +253,14 @@ class MusinsaService {
             throw new Error('무신사 클레임 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
         }
     }
-    
+
+    getClaimByReturnTraceNumber = async (returnTraceNumber) => {
+        try {
+            const claims =  await this.musinsaRepository.findAllClaimByReturnTraceNumber(returnTraceNumber);
+            return claims;
+        } catch (error) {
+            throw new Error('Get Claim By Return Trace Number 오류: ' + error.message);
+        }
+    }
 }
 module.exports = MusinsaService;

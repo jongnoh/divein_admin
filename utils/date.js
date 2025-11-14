@@ -6,6 +6,13 @@ class dateUtils
     today = today.replace("/", "-").replace("/", "-");
     return today;
 }
+    getKSTDateStringOfTwoWeeksAgo() {
+    let today = new Date();
+    today.setDate(today.getDate() - 14);
+    let twoWeeksAgo = today.toLocaleDateString("ja-jp");
+    twoWeeksAgo = twoWeeksAgo.replace("/", "-").replace("/", "-");
+    return twoWeeksAgo;
+}
 getLatestMonday() {
     const today = new Date();
     const day = today.getDay(); // 0=일요일, 1=월요일, 2=화요일, ..., 6=토요일

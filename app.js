@@ -26,6 +26,7 @@ app.get('/', (req, res) => {res.send('Hello World!');});
 app.post('/musinsa/login', musinsaController.login);
 app.post('/musinsa/refresh-token', musinsaController.refreshAccessToken);
 app.post('/musinsa/update-claims', musinsaController.updateClaims);
+app.get('/musinsa/claim/:returnTraceNumber', musinsaController.getClaimByReturnTraceNumber);
 
 const PORT = process.env.PORT || 3000;
 
@@ -43,10 +44,21 @@ app.listen(PORT, async () => {
   
 });
 
-if(!musinsaController.musinsaService.cookie){
-  musinsaController.autoLogin();
-}
-// 매일 24시간마다 무신사 자동 로그인 실행
-cron.schedule('*/24 * * * *', () => {
-  musinsaController.autoLogin();  
-})
+// if(!musinsaController.musinsaService.cookie){
+//   musinsaController.autoLogin();
+// }
+// // 매일 24시간마다 무신사 자동 로그인 실행
+// cron.schedule('*/24 * * * *', () => {
+//   musinsaController.autoLogin();  
+// })
+// // 로그인되어 있으면
+//   cron.schedule('*/3 * * * *', () => {
+//     if(musinsaController.musinsaService.cookie){
+//       musinsaController.musinsaService.refreshAccessToken();
+//     }
+//   });
+//   cron.schedule('0 */2 * * *', () => {
+//     if(musinsaController.musinsaService.cookie){
+//       musinsaController.musinsaService.updateClaims();
+//     }
+//   })
