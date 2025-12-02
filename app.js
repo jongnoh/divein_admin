@@ -27,6 +27,8 @@ app.post('/musinsa/login', musinsaController.login);
 app.post('/musinsa/refresh-token', musinsaController.refreshAccessToken);
 app.get('/musinsa/claim', musinsaController.getClaim);
 app.get('/musinsa/claim/detail', musinsaController.getClaimDetail);
+app.get('/musinsa/claim/detail/memo', musinsaController.getClaimDetailMemo);
+app.post('/musinsa/claim/process', musinsaController.processClaim);
 const PORT = process.env.PORT || 3000;
 
 testConnection()

@@ -10,6 +10,7 @@ const { default: axios, get } = require('axios');
 const { ref } = require('process');
 const dateUtils = require('../utils/date.js');
 
+const musinsaReturnReasons = require('../utils/musinsa.return.reason.js');
 
 class MusinsaService {
 
@@ -24,7 +25,7 @@ class MusinsaService {
         this.refreshToken = null;
         this.partner_platform_atk = null;
         this.partner_platform_rtk = null;
-        
+        this.musinsaReturnReasons = musinsaReturnReasons;
 
     }
     login = async (loginId, pw) => {
@@ -267,7 +268,28 @@ class MusinsaService {
             throw new Error('무신사 클레임 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
         }
     }
-    getClaimDetail = async (orderNumber, orderOptNumber) => {
+        getClaimDetail = async (orderNumber, orderOptNumber) => {
+        try {
+            console.log(`orderNumber: ${orderNumber}, orderOptNumber: ${orderOptNumber} detail 요청 중`);
+            let formData = new FormData();
+            formData.append('ORD_NO', orderNumber);
+            formData.append('ORD_OPT_NO', orderOptNumber);
+            const claimDetailResponse = await axios({
+                method: 'post',
+                url: 'https://bizest.musinsa.com/po/order-group-admin/api/order/ord01/get_detail',
+                data: formData,
+                headers: {
+                'cookie': this.cookie
+                }
+            })
+            const details = claimDetailResponse.data.claim
+            return details;
+
+        } catch (error) {
+            throw new Error('무신사 클레임 상세 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+    getClaimDetailMemo = async (orderNumber, orderOptNumber) => {
         try {
             console.log(`orderNumber: ${orderNumber}, orderOptNumber: ${orderOptNumber} detail 요청 중`);
             let formData = new FormData();
@@ -293,6 +315,40 @@ class MusinsaService {
 
         } catch (error) {
             throw new Error('무신사 클레임 상세 내역을 가져오는 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+
+
+
+    // 미완 (실제 케이스로 테스트 필요)
+    processClaim = async (orderNumber, orderOptNumber, deliveryNumber) => {
+        try {
+            //클레임 조회
+            const detail = await this.getClaimDetail(orderNumber, orderOptNumber);
+
+            let formData = new FormData();
+            formData.append('ordOptNo', orderOptNumber);
+            formData.append('claimNo', detail.CLM_NO);
+            formData.append('clmQty', "1");
+            formData.append('ord_qty', "1");
+            formData.append('stockYn', "y");
+            formData.append('dlvCd', detail.DLV_CD);
+            formData.append('dlvNo', deliveryNumber || detail.DLV_NO);
+            formData.append('updateReturnDeliveryInfoYn', deliveryNumber ? "n" : "y");
+            formData.append('clmReason', detail.CLM_REASON);
+
+            const process = await axios({
+                method: 'post',
+                url: 'https://bizest.musinsa.com/po/order-group-admin/api/order/ord01/check',
+                data: formData,
+                headers: {
+                'cookie': this.cookie
+                }
+            })
+            console.log( `${process.data.message}` )
+            return process.data;
+        } catch (error) {
+            throw new Error('클레임 검수완료 처리 중 오류가 발생했습니다: ' + error.message);
         }
     }
 }

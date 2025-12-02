@@ -83,6 +83,21 @@ class MusinsaController  {
             });
         }
     }
+    getClaimDetailMemo = async (req, res) => {
+        try {
+            const { orderNumber, orderOptNumber } = req.query;
+            const result = await this.musinsaService.getClaimDetailMemo(orderNumber, orderOptNumber);
+            res.status(result.statusCode || 200).json(result);
+        } catch (error) {
+            console.error('Get Claim Detail 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    } 
     getClaimDetail = async (req, res) => {
         try {
             const { orderNumber, orderOptNumber } = req.query;
@@ -90,6 +105,38 @@ class MusinsaController  {
             res.status(result.statusCode || 200).json(result);
         } catch (error) {
             console.error('Get Claim Detail 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
+    processClaim = async (req,res) => {
+        try {
+            const orderNumber = req.body.orderNumber;
+            const orderOptNumber = req.body.orderOptNumber;
+            const process = await this.musinsaService.processClaim(orderNumber, orderOptNumber);
+            return res.status(200).json(process);
+        } catch (error) {
+            console.error('Process Claim 오류:', error);
+            res.status(error.statusCode || 500).json({
+                success: false,
+                statusCode: error.statusCode || 500,
+                message: error.message || 'Internal Server Error',
+                error: error.error || 'UNKNOWN_ERROR'
+            });
+        }
+    }
+    processClaim = async (req,res) => {
+        try {
+            const claimNumber = req.body.claimNumber;
+            const orderOptNumber = req.body.orderOptNumber;
+            const process = await this.musinsaService.processClaim(claimNumber, orderOptNumber);
+            return res.status(200).json(process);
+        } catch (error) {
+            console.error('Process Claim 오류:', error);
             res.status(error.statusCode || 500).json({
                 success: false,
                 statusCode: error.statusCode || 500,
