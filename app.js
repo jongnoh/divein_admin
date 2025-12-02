@@ -46,15 +46,15 @@ app.listen(PORT, async () => {
 
 // cron
 
-// if(!musinsaController.musinsaService.cookie){
-//     musinsaController.autoLogin();
-//     }
+if(!musinsaController.musinsaService.cookie){
+    musinsaController.autoLogin();
+    }
 
-// // 매일 24시간마다 무신사 자동 로그인 실행
-// cron.schedule('*/24 * * * *', () => {
-//     musinsaController.autoLogin();
-//     }
-// )
+// 매일 24시간마다 무신사 자동 로그인 실행
+cron.schedule('*/24 * * * *', () => {
+    musinsaController.autoLogin();
+    }
+)
 
 
 // cron.schedule('*/3 * * * *', () => {

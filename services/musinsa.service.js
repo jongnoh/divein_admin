@@ -33,19 +33,22 @@ class MusinsaService {
             //id 비밀번호 로그인
             const login = await axios({
                 method: 'post',
-                url: 'https://api.dashboard.partner.musinsa.com/auth/login',
+                url: 'https://api.one.musinsa.com/api2/partner/oauth/v3/authentication/login/password',
                 headers: {
                     'accept': 'application/json',
                     'accept-encoding': 'gzip,deflate,br,zstd',
                     'accept-language': 'ko-KR,ko;q=0.9',
                     'content-type': 'application/json',
-                    'origin': 'https://partner.musinsa.com',
-                    'referer': 'https://partner.musinsa.com/',
+                    'origin': 'https://partner-sso.one.musinsa.com',
+                    'referer': 'https://partner-sso.one.musinsa.com/',
                     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36'
                 },
                 data: {
+                    clientId: "MUSINSA_PARTNER",
                     "id": loginId,
                     "password": pw,
+                    platform: "mss",
+                    redirectUri: "https://partner.musinsa.com",
                 },
                 maxRedirects: 0
             })
@@ -60,30 +63,7 @@ class MusinsaService {
 
             const twoFactorVerification = await axios({
                 method: 'post',
-                url: 'https://api.dashboard.partner.musinsa.com/auth/otp/verification',
-                headers: {
-                    'accept': 'application/json',
-                    'accept-encoding': 'gzip,deflate,br,zstd',
-                    'accept-language': 'ko-KR,ko;q=0.9',
-                    'content-type': 'application/json',
-                    'origin': 'https://partner.musinsa.com',
-                    'referer': 'https://partner.musinsa.com/',
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
-                    'cookie': cookie
-                },
-                data: {
-                    "verificationCode": twoFactor
-                },
-                maxRedirects: 0
-            })
-            cookie = twoFactorVerification.headers['set-cookie'].join('; ')
-            this.cookie = cookie
-            const authcode = twoFactorVerification.data.ssoUuid
-            const refreshToken = twoFactorVerification.data.refreshToken
-            //Oauth 인증
-            const OAuth = await axios({
-                method: 'post',
-                url: 'https://api.one.musinsa.com/api2/partner/oauth/token',
+                url: 'https://api.one.musinsa.com/api2/partner/oauth/v3/authentication/login/otp',
                 headers: {
                     'accept': 'application/json',
                     'accept-encoding': 'gzip,deflate,br,zstd',
@@ -92,16 +72,46 @@ class MusinsaService {
                     'origin': 'https://partner-sso.one.musinsa.com',
                     'referer': 'https://partner-sso.one.musinsa.com/',
                     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
-                    'cookie': this.cookie
+                    'cookie': cookie
                 },
                 data: {
-                    "authCode": authcode
+                    clientId: "MUSINSA_PARTNER",
+                    code: twoFactor,
+                    id: loginId,
+                    platform: "mss",
+                    redirectUri: "https://partner.musinsa.com",
+                    twoFactorType: "OTP"
                 },
                 maxRedirects: 0
             })
-            this.partner_platform_atk = OAuth.headers['set-cookie'].find(cookie => cookie.startsWith('partner-platform-atk')).split(';')[0].split('=')[1];
-            this.partner_platform_rtk = OAuth.headers['set-cookie'].find(cookie => cookie.startsWith('partner-platform-rtk')).split(';')[0].split('=')[1];
+            cookie = twoFactorVerification.headers['set-cookie'].join('; ')
+            this.cookie = cookie
+            const authcode = twoFactorVerification.data.ssoUuid
+            const refreshToken = cookie.split('pp-auth-rtk=')[1].split(';')[0];
             this.refreshToken = refreshToken.trim()
+            // //Oauth 인증
+            // const OAuth = await axios({
+            //     method: 'post',
+            //     url: 'https://api.one.musinsa.com/api2/partner/oauth/v3/authentication/login/otp/key/confirmed',
+            //     headers: {
+            //         'accept': 'application/json',
+            //         'accept-encoding': 'gzip,deflate,br,zstd',
+            //         'accept-language': 'ko-KR,ko;q=0.9',
+            //         'content-type': 'application/json',
+            //         'origin': 'https://partner-sso.one.musinsa.com',
+            //         'referer': 'https://partner-sso.one.musinsa.com/',
+            //         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+            //         'cookie': this.cookie
+            //     },
+            //     data: {
+            //         "authCode": authcode
+            //     },
+            //     maxRedirects: 0
+            // })
+            // this.partner_platform_atk = OAuth.headers['set-cookie'].find(cookie => cookie.startsWith('partner-platform-atk')).split(';')[0].split('=')[1];
+            // this.partner_platform_rtk = OAuth.headers['set-cookie'].find(cookie => cookie.startsWith('partner-platform-rtk')).split(';')[0].split('=')[1];
+            // this.refreshToken = refreshToken.trim()
+
             // accessToken 발급
             const getAccessToken = await axios({
                 method: 'post',
