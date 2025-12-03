@@ -21,14 +21,17 @@ const PostController = require('./controllers/post.controller.js');
 const musinsaController = new MusinsaController();
 const postController = new PostController();
 
+const apiAuth = require('./middlewares/auth.js');
+
 app.get('/', (req, res) => {res.send('Hello World!');});
 
-app.post('/musinsa/login', musinsaController.login);
-app.post('/musinsa/refresh-token', musinsaController.refreshAccessToken);
-app.get('/musinsa/claim', musinsaController.getClaim);
-app.get('/musinsa/claim/detail', musinsaController.getClaimDetail);
-app.get('/musinsa/claim/detail/memo', musinsaController.getClaimDetailMemo);
-app.post('/musinsa/claim/process', musinsaController.processClaim);
+app.use('/api', apiAuth);
+app.post('/api/musinsa/login', musinsaController.login);
+app.post('/api/musinsa/refresh-token', musinsaController.refreshAccessToken);
+app.get('/api/musinsa/claim', musinsaController.getClaim);
+app.get('/api/musinsa/claim/detail', musinsaController.getClaimDetail);
+app.get('/api/musinsa/claim/detail/memo', musinsaController.getClaimDetailMemo);
+app.post('/api/musinsa/claim/process', musinsaController.processClaim);
 const PORT = process.env.PORT || 3000;
 
 testConnection()
