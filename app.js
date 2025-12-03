@@ -59,11 +59,11 @@ cron.schedule('*/24 * * * *', () => {
 )
 
 
-// cron.schedule('*/3 * * * *', () => {
-//     if(musinsaController.musinsaService.cookie){
-//     musinsaController.musinsaService.refreshAccessToken();
-//     }
-// });
+cron.schedule('*/3 * * * *', () => {
+    if(musinsaController.musinsaService.cookie){
+    musinsaController.musinsaService.refreshAccessToken();
+    }
+});
 
 
 // cron.schedule('0 */2 * * *', () => {

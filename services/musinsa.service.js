@@ -332,7 +332,7 @@ class MusinsaService {
             formData.append('clmQty', "1");
             formData.append('ord_qty', "1");
             formData.append('stockYn', "y");
-            formData.append('dlvCd', detail.DLV_CD);
+            formData.append('dlvCd', detail.DLV_CD || "CJGLS");
             formData.append('dlvNo', deliveryNumber || detail.DLV_NO);
             formData.append('updateReturnDeliveryInfoYn', deliveryNumber ? "n" : "y");
             formData.append('clmReason', detail.CLM_REASON);
@@ -345,11 +345,22 @@ class MusinsaService {
                 'cookie': this.cookie
                 }
             })
-            console.log( `${process.data.message}` )
-            return process.data;
+
+            const check = await axios({
+                method: 'get',
+                url: `https://bizest.musinsa.com/po/order-group-admin/popup/pop_return_detail?ord_opt_no=${orderOptNumber}&LAYOUT_TYPE=popup`,
+                headers: {
+                    'cookie': this.cookie
+                }
+            })
+            const checkResult = check.data.split('검수결과')[1].split('<strong>')[1].split('</strong>')[0].trim();
+            console.log( `${process.data.message} : ${checkResult}` )
+            return { message: process.data.message, result: checkResult, claimNumber: detail.CLM_NO };
         } catch (error) {
             throw new Error('클레임 검수완료 처리 중 오류가 발생했습니다: ' + error.message);
         }
     }
 }
 module.exports = MusinsaService;
+
+
