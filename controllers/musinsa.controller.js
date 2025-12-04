@@ -129,21 +129,5 @@ class MusinsaController  {
             });
         }
     }
-    processClaim = async (req,res) => {
-        try {
-            const claimNumber = req.body.claimNumber;
-            const orderOptNumber = req.body.orderOptNumber;
-            const process = await this.musinsaService.processClaim(claimNumber, orderOptNumber);
-            return res.status(200).json(process);
-        } catch (error) {
-            console.error('Process Claim 오류:', error);
-            res.status(error.statusCode || 500).json({
-                success: false,
-                statusCode: error.statusCode || 500,
-                message: error.message || 'Internal Server Error',
-                error: error.error || 'UNKNOWN_ERROR'
-            });
-        }
-    }
 }
 module.exports = MusinsaController;
