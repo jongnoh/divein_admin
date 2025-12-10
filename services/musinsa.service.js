@@ -360,6 +360,8 @@ class MusinsaService {
             throw new Error('클레임 검수완료 처리 중 오류가 발생했습니다: ' + error.message);
         }
     }
+
+    
 }
 module.exports = MusinsaService;
 
